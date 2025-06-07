@@ -48,7 +48,7 @@ $.web = `https://cdn.jsdelivr.net/gh/chavyleung/scripts@${
   $.version
 }/box/chavy.boxjs.html?_=${new Date().getTime()}`
 // 版本说明地址 (Release Note)
-$.ver = `https://raw.githubusercontent.com/chavyleung/scripts/master/box/release/box.release.json`
+$.ver = `https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/JSON/box.release.json`
 
 !(async () => {
   // 勿扰模式
@@ -402,7 +402,7 @@ function getSystemApps() {
         { id: '@chavy_boxjs_userCfgs.httpapis', name: 'HTTP-API (Surge)', val: '', type: 'textarea', placeholder: ',examplekey@127.0.0.1:6166', autoGrow: true, rows: 2, persistentHint:true, desc: '示例: ,examplekey@127.0.0.1:6166! 注意: 以逗号开头, 逗号分隔多个地址, 可加回车' },
         { id: '@chavy_boxjs_userCfgs.httpapi_timeout', name: 'HTTP-API Timeout (Surge)', val: 20, type: 'number', persistentHint:true, desc: '如果脚本作者指定了超时时间, 会优先使用脚本指定的超时时间.' },
         { id: '@chavy_boxjs_userCfgs.http_backend', name: 'HTTP Backend (Quantumult X)', val: '', type: 'text',placeholder: 'http://127.0.0.1:9999', persistentHint:true, desc: '示例: http://127.0.0.1:9999 ! 注意: 必须是以 http 开头的完整路径, 不能是 / 结尾' },
-        { id: '@chavy_boxjs_userCfgs.debugger_webs', name: '调试地址', val: 'Dev体验,https://raw.githubusercontent.com/chavyleung/scripts/boxjs.dev/box/chavy.boxjs.html', type: 'textarea', placeholder: '每行一个配置，用逗号分割每个配置的名字和链接：配置,url', persistentHint:true, autoGrow: true, rows: 2, desc: '逗号分隔名字和链接, 回车分隔多个地址' },
+        { id: '@chavy_boxjs_userCfgs.debugger_webs', name: '调试地址', val: 'Dev体验,https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/HTML/boxjs.html', type: 'textarea', placeholder: '每行一个配置，用逗号分割每个配置的名字和链接：配置,url', persistentHint:true, autoGrow: true, rows: 2, desc: '逗号分隔名字和链接, 回车分隔多个地址' },
         { id: '@chavy_boxjs_userCfgs.bgimgs', name: '背景图片清单', val: '无,\n跟随系统,跟随系统\nlight,http://api.btstu.cn/sjbz/zsy.php\ndark,https://uploadbeta.com/api/pictures/random\n妹子,http://api.btstu.cn/sjbz/zsy.php', type: 'textarea', placeholder: '无,{回车} 跟随系统,跟随系统{回车} light,图片地址{回车} dark,图片地址{回车} 妹子,图片地址', persistentHint:true, autoGrow: true, rows: 2, desc: '逗号分隔名字和链接, 回车分隔多个地址' },
         { id: '@chavy_boxjs_userCfgs.bgimg', name: '背景图片', val: '', type: 'text', placeholder: 'http://api.btstu.cn/sjbz/zsy.php', persistentHint:true, desc: '输入背景图标的在线链接' },
         { id: '@chavy_boxjs_userCfgs.changeBgImgEnterDefault', name: '手势进入壁纸模式默认背景图片', val: '', type: 'text', placeholder: '填写上面背景图片清单的值', persistentHint:true, desc: '' },
@@ -413,31 +413,31 @@ function getSystemApps() {
       scripts: [
         {
           name: "抹掉：所有缓存",
-          script: "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.caches.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Scripts/boxjs.revert.caches.js"
         },
         {
           name: "抹掉：收藏应用",
-          script: "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.usercfgs.favapps.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Scripts/boxjs.revert.usercfgs.favapps.js"
         },
         {
           name: "抹掉：用户偏好",
-          script: "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.usercfgs.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Scripts/boxjs.revert.usercfgs.js"
         },
         {
           name: "抹掉：所有会话",
-          script: "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.usercfgs.sessions.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Scripts/boxjs.revert.usercfgs.sessions.js"
         },
         {
           name: "抹掉：所有备份",
-          script: "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.baks.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Scripts/boxjs.revert.baks.js"
         },
         {
           name: "抹掉：BoxJs (注意备份)",
-          script: "https://raw.githubusercontent.com/chavyleung/scripts/master/box/scripts/boxjs.revert.boxjs.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Scripts/boxjs.revert.boxjs.js"
         }
       ],
       author: '@chavyleung',
-      repo: 'https://github.com/chavyleung/scripts/blob/master/box/switcher/box.switcher.js',
+      repo: 'https://github.com/BOBOLAOSHIV587/zTest/blob/main/BoxJs/JS/Scripts/box.switcher.js',
       icons: [
         'https://raw.githubusercontent.com/chavyleung/scripts/master/box/icons/BoxSetting.mini.png',
         'https://raw.githubusercontent.com/chavyleung/scripts/master/box/icons/BoxSetting.png'
@@ -450,12 +450,12 @@ function getSystemApps() {
       keys: [],
       settings: [{ id: 'CFG_BoxSwitcher_isSilent', name: '静默运行', val: false, type: 'boolean', desc: '切换会话时不发出系统通知!' }],
       author: '@chavyleung',
-      repo: 'https://github.com/chavyleung/scripts/blob/master/box/switcher/box.switcher.js',
+      repo: 'https://github.com/BOBOLAOSHIV587/zTest/blob/main/BoxJs/JS/Scripts/box.switcher.js',
       icons: [
         'https://raw.githubusercontent.com/chavyleung/scripts/master/box/icons/BoxSwitcher.mini.png',
         'https://raw.githubusercontent.com/chavyleung/scripts/master/box/icons/BoxSwitcher.png'
       ],
-      script: 'https://raw.githubusercontent.com/chavyleung/scripts/master/box/switcher/box.switcher.js'
+      script: 'https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Scripts/box.switcher.js'
     },
     {
       id: "BoxGist",
@@ -468,7 +468,7 @@ function getSystemApps() {
         "@gist.backup_type"
       ],
       author: "@dompling",
-      repo: "https://github.com/dompling/Script/tree/master/gist",
+      repo: "https://github.com/BOBOLAOSHIV587/zTest/tree/main/BoxJs/JS/Gist",
       icons: [
         "https://raw.githubusercontent.com/Former-Years/icon/master/github-bf.png",
         "https://raw.githubusercontent.com/Former-Years/icon/master/github-bf.png"
@@ -491,15 +491,15 @@ function getSystemApps() {
       scripts: [
         {
           name: "备份 Gist",
-          script: "https://raw.githubusercontent.com/dompling/Script/master/gist/backup.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Gist/backup.js"
         },
         {
           name: "从 Gist 恢复",
-          script: "https://raw.githubusercontent.com/dompling/Script/master/gist/restore.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Gist/restore.js"
         },
         {
           name: "更新历史版本",
-          script: "https://raw.githubusercontent.com/dompling/Script/master/gist/commit.js"
+          script: "https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/BoxJs/JS/Gist/commit.js"
         }
       ],
       settings: [
