@@ -1,0 +1,16 @@
+#!name=波波老师自用规则
+#!desc=波波老师自用规则
+#!category=😍BOBO Rules
+
+
+##### DIRECT #####
+DOMAIN-SUFFIX,0nzuqy0k3c35.com,DIRECT
+DOMAIN-SUFFIX,besizidxa5nu.com,DIRECT
+
+
+##### PROXY #####
+DOMAIN-SUFFIX,cnys.tv,PROXY
+
+
+##### REJECT #####
+
