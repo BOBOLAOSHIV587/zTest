@@ -9,50 +9,12 @@
 
 ****************************
 
-‼️酷我音乐&酷我畅听(全能解锁完美版)
-
-❗️适配版本  酷我音乐及酷我畅听商店最新版
-
-❗️解锁项目
-
-1：音乐，小说，短剧(音质最高支持到“至臻音质2.0”)
-2：装扮中心已解锁Svip权限：(个性皮肤,头像挂件,播放器,桌面图标,评论区字体,启动画面,桌面歌词)
-
-‼️确保按以上方法更新后重启酷我音乐即可。
-
-
-‼️如按上述操作后仍提示需开通会员或一直缓冲，请关闭其余去广告分流，插件或模块，仅保留本插件一项，同时将分流规则设为“全部直连”。测试正常后再逐一开启其余功能，以排查是哪一个和本脚本冲突。
-
-
-❗️食用方法：
-
-1：Loon插件引入以下链接(安装插件完成后需指派策略：国内网络选直连，国外网络选中国节点)
-2：圈叉重写引入以下链接(需开启资源解析器)
-
-脚本链接：https://napi.ltd/script/Worker/KuWo.js
-
 [rewrite_local]
 ^.*?(ad(.*)?\.tencentmusic\.com|kuwo\.cn\/((EcomResource|(Mobile)?Ad)Serv(er|ice)|(vip|(open)?api)?\/v\d\/(user\/freeMode|sysinfo\?op\=getRePayAndDoPayBox(New)?|album\/adBar|app\/(newMenuList\/menuListInfo|pasterAdvert\/config)|api\/advert\/(iListen|album)|operate\/pop\/info|-online\/sign\/new\/playEntryV1-)|kuwopay\/vip-tab\/page\/floatbox)) url reject-200
-^(?!.*img).*?(abt-kuwo\.tencentmusic\.com|kuwo\.cn)(/vip|/(open)?api)?(/enc.*?signver|/(v\d/)?(pay/app/getConfigInfo|app/startup/config|user/vip\?(vers|apiVersion|platform|op\=ui|_t)|theme\?op=gd|api/((pay/)?(user/info|payInfo/kwplayer/payMiniBar)|advert/myPage)|tingshu/index/radio|operate/homePage)|/kuwo/ui/info$|/kuwopay\/personal\/cells|/pay/viptab/index\.html|/kuwopay/vip-tab/(setting|page/cells)|/a\.p($|\?newver\=\d$|.*?op\=(getvip|policy_shortvideo)|.*?ptype\=vip)|/commercia/vip/(player/getStyleListByModel|hanger/wear)|/authPay|/mobi\.s\?f\=kwxs|/music\.pay\?newver\=\d$|/basedata\.s\?type\=get_album_info|/mgxh\.s\?user) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/KuWoMusic/JS/KUWO.js
+^(?!.*img).*?(abt-kuwo\.tencentmusic\.com|kuwo\.cn)(/vip|/(open)?api)?(/enc.*?signver|/(v\d/)?(pay/app/getConfigInfo|app/startup/config|user/vip\?(vers|apiVersion|platform|op\=ui|_t)|theme\?op=gd|api/((pay/)?(user/info|payInfo/kwplayer/payMiniBar)|advert/myPage)|tingshu/index/radio|operate/homePage)|/kuwo/ui/info$|/kuwopay\/personal\/cells|/pay/viptab/index\.html|/kuwopay/vip-tab/(setting|page/cells)|/a\.p($|\?newver\=\d$|.*?op\=(getvip|policy_shortvideo)|.*?ptype\=vip)|/commercia/vip/(player/getStyleListByModel|hanger/wear)|/authPay|/mobi\.s\?f\=kwxs|/music\.pay\?newver\=\d$|/basedata\.s\?type\=get_album_info|/mgxh\.s\?user) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Ad.js
 
 
 [mitm]
-hostname = *.kuwo.cn, *.tencentmusic.com
-
-****************************
-
-3：surge 模块(安装新模块)
-模块链接：https://napi.ltd/script/Worker/KuWo.sgmodule
-
-[Rewrite]
-^.*?(ad(.*)?\.tencentmusic\.com|kuwo\.cn\/((EcomResource|(Mobile)?Ad)Serv(er|ice)|(vip|(open)?api)?\/v\d\/(user\/freeMode|sysinfo\?op\=getRePayAndDoPayBox(New)?|album\/adBar|app\/(newMenuList\/menuListInfo|pasterAdvert\/config)|api\/advert\/(iListen|album)|operate\/pop\/info|online\/sign\/new\/playEntryV1)|kuwopay\/vip-tab\/page\/floatbox)) reject-200
-
-
-[Script]
-http-response ^(?!.*img).*?(abt-kuwo\.tencentmusic\.com|kuwo\.cn)(/vip|/(open)?api)?(/enc.*?signver|/(v\d/)?(pay/app/getConfigInfo|app/startup/config|user/vip\?(vers|apiVersion|platform|op\=ui|_t)|theme\?op=gd|api/((pay/)?(user/info|payInfo/kwplayer/payMiniBar)|advert/myPage)|tingshu/index/radio|operate/homePage)|/kuwo/ui/info$|/kuwopay\/personal\/cells|/pay/viptab/index\.html|/kuwopay/vip-tab/(setting|page/cells)|/a\.p($|\?newver\=\d$|.*?op\=(getvip|policy_shortvideo)|.*?ptype\=vip)|/commercia/vip/(player/getStyleListByModel|hanger/wear)|/authPay|/mobi\.s\?f\=kwxs|/music\.pay\?newver\=\d$|/basedata\.s\?type\=get_album_info|/mgxh\.s\?user) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/KuWoMusic/JS/KUWO.js, requires-body=true, timeout=60, tag=酷我音乐, img-url=https://static.napi.ltd/Image/KuWo.png
-
-
-[Mitm]
 hostname = *.kuwo.cn, *.tencentmusic.com
 
 ****************************/
