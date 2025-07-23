@@ -1,7 +1,7 @@
 /*
 
 [rewrite_local]
-^https?:\/\/gateway\.kugou\.com url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
+#^https?:\/\/gateway\.kugou\.com url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
 
 kg_gateway = type=http-response, pattern=^https:\/\/gateway\.kugou\.com\/(?:adp\/ad\/v1\/mine_top_banner|ads\.gateway\/v2\/home_card), script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=true
 
