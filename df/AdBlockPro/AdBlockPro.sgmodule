@@ -1,0 +1,13 @@
+#!name=AdBlockPro
+#!desc=AdBlockPro 终身订阅
+#!category=😍BOBO Premium
+#!homepage=https://github.com/BOBOLAOSHIV587/Rules
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/AdBlockPro.png
+#!openUrl=https://apps.apple.com/app/id1018301773
+
+[Script]
+# > AdBlockPro 终身订阅
+AdBlock = type=http-response, pattern=https:\/\/api\.adblockpro\.app\/verify, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/AdBlockPro/JS/AdBlock.js, requires-body=true, max-size=-1, timeout=60
+
+[MITM]
+hostname = %APPEND% api.adblockpro.app
