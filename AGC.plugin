@@ -1,0 +1,14 @@
+#!name=AGC Video Player
+#!desc=AGC解锁会员1-17
+#!date=2025-07-31
+#!category=😍BOBO Premium
+#!author=baby[https://github.com/Yu9191]
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/AGC.png
+#!openUrl=https://apps.apple.com/app/id6670426427
+
+[Script]
+# > AGC Video Player解锁会员
+http-response https://api.agcplayer.com/ script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/AGC/JS/AGC.js, requires-body=true, timeout=60, tag=AGC
+
+[Mitm]
+hostname = api.agcplayer.com
