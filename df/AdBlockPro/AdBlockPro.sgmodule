@@ -4,5 +4,3 @@
 # > AdBlockPro 终身订阅
 AdBlock = type=http-response, pattern=https:\/\/api\.adblockpro\.app\/verify, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/AdBlockPro/JS/AdBlock.js, requires-body=true, max-size=-1, timeout=60
 
-[MITM]
-hostname = %APPEND% api.adblockpro.app

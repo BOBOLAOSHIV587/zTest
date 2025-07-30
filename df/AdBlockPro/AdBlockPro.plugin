@@ -3,5 +3,3 @@
 # > AdBlockPro 终身订阅
 http-response https:\/\/api\.adblockpro\.app\/verify script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/AdBlockPro/JS/AdBlock.js, requires-body=true, timeout=60, tag=AdBlock
 
-[MITM]
-hostname = api.adblockpro.app
