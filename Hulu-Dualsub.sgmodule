@@ -1,0 +1,13 @@
+#!name=Hulu Dualsub
+#!desc=Hulu subtitles add-ons
+#!date=2025-08-01
+#!category=😍BOBO Enhance
+#!author=狗哥Neurogram-R[https://github.com/Neurogram-R]
+#!openUrl=https://www.icloud.com/shortcuts/8ec4a2a3af514282bf27a11050f39fc2
+
+[Script]
+Hulu-Dualsub = type=http-response,pattern=^http.+huluim.com\/.+\.vtt$,requires-body=1,max-size=0,timeout=30,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Surge/Dualsub/JS/Dualsub.js
+Hulu-Dualsub-Setting = type=http-request,pattern=https:\/\/setting.huluim.com\/\?action=(g|s)et,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Surge/Dualsub/JS/Dualsub.js
+
+[MITM]
+hostname = %APPEND% *.huluim.com
