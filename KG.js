@@ -1,19 +1,33 @@
 /******************************
-
-脚本功能：酷狗音乐——解锁VIP
-软件版本：12.2.0
-更新时间：2024.04.14
-
-
+网易Cookie
 *******************************
 [rewrite_local]
-^https:\/\/gateway\.kugou\.com\/updateservice\/ url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
+^https?:\/\/music\.163\.com url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
 
-                            
 [mitm]
-hostname = gateway.kugou.com
+hostname = music.163.com
 
 *******************************/
 
-body = $response.body.replace(/\"is_vip":\w+/g, '\"is_vip":1')
-$done({body});
+
+let cookieName = `CookieWY`;
+let headerCookie = $request.headers["Cookie"];
+let historyCookie = $prefs.valueForKey(cookieName);
+if (historyCookie) {
+  if (historyCookie != headerCookie) {
+    var cookie = $prefs.setValueForKey(headerCookie, cookieName);
+    if (!cookie) {
+      $notify("更新网易Cookie失败‼️‼️", "", "请重试");
+    } else {
+      $notify("更新网易Cookie成功🎉", "", "无需禁用脚本，仅cookie改变时才会重新获取");
+    }
+  }
+} else {
+  var cookie = $prefs.setValueForKey(headerCookie, cookieName);
+  if (!cookie) {
+    $notify("首次写入网易Cookie失败‼️‼️", "", "请重试");
+  } else {
+    $notify("首次写入网易Cookie成功🎉", "", "无需禁用脚本，仅cookie改变时才会重新获取");
+  }
+}
+$done({});
