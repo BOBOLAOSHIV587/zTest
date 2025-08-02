@@ -1,8 +1,0 @@
-
-
-[Script]
-# > 1Blocker 解锁永久订阅
-http-response ^https?:\/\/api\.revenuecat\.com\/v1\/(receipts|subscribers\/) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/1Blocker/JS/1BlockerProCrack.js, requires-body=true, timeout=60, tag=1BlockerProCrack
-
-[MITM]
-hostname = api.revenuecat.com
