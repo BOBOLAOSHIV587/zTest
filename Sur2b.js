@@ -15,446 +15,270 @@ hostname = www.youtube.com
 
 
 
-/*
-* Quantumult X compatible version of the Sur2b script
-* Sur2b: YouTube Video Subtitle Translation and Summary
-* Original environment: Surge (based on API usage)
-* Quantumult X equivalent APIs used: $prefs, $task.fetch, $notify
-*/
-
-// Quantumult X doesn't use $request.url, it uses $request.URL.
-// And it doesn't have $response.body in a response script unless it's a Tweak.
-// Assuming this is used as a 'script-response-body' script for the YouTube timedtext request.
-// In Quantumult X 'script-response-body', we use $request and $response objects.
-
 const url = $request.url;
-let body = $response.body; // Assuming the body is available for modification
-let subtitleData;
-// Use $prefs for persistent storage
-let conf = $prefs.value('Sur2bConf');
+let body, subtitleData;
+let conf = $prefs.valueForKey('Sur2bConf');
 const autoGenSub = url.includes('&kind=asr');
 const videoID = url.match(/(\?|&)v=([^&]+)/)?.[2];
 const sourceLang = url.match(/&lang=([^&]+)/)?.[1];
-let cache = $prefs.value('Sur2bCache') || '{}';
+let cache = $prefs.valueForKey('Sur2bCache') || '{}';
 cache = JSON.parse(cache);
 
 (async () => {
 
-    // Configuration endpoint logic
-    if (url.includes('timedtextConf')) {
-        const newConf = JSON.parse($request.body);
-        if (newConf.delCache) $prefs.remove('Sur2bCache');
-        delete newConf.delCache;
-        $prefs.setValue(JSON.stringify(newConf), 'Sur2bConf');
-        // In Quantumult X, we just return the final modified $response object, 
-        // but for a simple 'OK' response, we can just exit.
-        return $done({ response: { body: 'OK' } });
+  if (url.includes('timedtextConf')) {
+    const newConf = JSON.parse($request.body);
+    if (newConf.delCache) $prefs.setValueForKey('{}', 'Sur2bCache');
+    delete newConf.delCache;
+    $prefs.setValueForKey(JSON.stringify(newConf), 'Sur2bConf');
+    return $done({ response: { body: 'OK' } });
+  };
+
+  if (!conf) {
+    $notify('Sur2b', '', '请先通过捷径配置脚本');
+    return $done({});
+  };
+
+  conf = JSON.parse(conf);
+  body = $response.body;
+  subtitleData = processTimedText(body);
+
+  if (!subtitleData.processedText) {
+    $notify('Sur2b', '', '未匹配到字幕内容');
+    return $done({});
+  };
+
+  let summaryContent, translatedBody;
+
+  if (conf.videoSummary && subtitleData.maxT <= conf.summaryMaxMinutes * 60 * 1000) summaryContent = await summarizer();
+  if (conf.videoTranslation && subtitleData.maxT <= conf.translationMaxMinutes * 60 * 1000) translatedBody = await translator();
+
+  if ((summaryContent || translatedBody) && videoID && sourceLang) {
+    if (!cache[videoID]) cache[videoID] = {};
+    if (!cache[videoID][sourceLang]) cache[videoID][sourceLang] = {};
+
+    if (summaryContent) {
+      cache[videoID][sourceLang].summary = {
+        content: summaryContent,
+        timestamp: new Date().getTime()
+      };
     };
 
-    if (!conf) {
-        $notify('Sur2b', '', '请先通过配置界面配置脚本');
-        return $done({});
+    if (translatedBody) {
+      if (!cache[videoID][sourceLang].translation) cache[videoID][sourceLang].translation = {};
+      cache[videoID][sourceLang].translation[conf.targetLanguage] = {
+        content: translatedBody,
+        timestamp: new Date().getTime()
+      };
     };
+  };
 
-    conf = JSON.parse(conf);
-
-    // body is already $response.body from the scope
-    subtitleData = processTimedText(body);
-
-    if (!subtitleData.processedText) {
-        $notify('Sur2b', '', '未匹配到字幕内容');
-        return $done({});
-    };
-
-    let summaryContent, translatedBody;
-
-    if (conf.videoSummary && subtitleData.maxT <= conf.summaryMaxMinutes * 60 * 1000) summaryContent = await summarizer();
-    if (conf.videoTranslation && subtitleData.maxT <= conf.translationMaxMinutes * 60 * 1000) translatedBody = await translator();
-
-    if ((summaryContent || translatedBody) && videoID && sourceLang) {
-
-        if (!cache[videoID]) cache[videoID] = {};
-        if (!cache[videoID][sourceLang]) cache[videoID][sourceLang] = {};
-
-        if (summaryContent) {
-            cache[videoID][sourceLang].summary = {
-                content: summaryContent,
-                timestamp: new Date().getTime()
-            };
-        };
-
-        if (translatedBody) {
-            if (!cache[videoID][sourceLang].translation) cache[videoID][sourceLang].translation = {};
-            cache[videoID][sourceLang].translation[conf.targetLanguage] = {
-                content: translatedBody,
-                timestamp: new Date().getTime()
-            };
-        };
-
-    };
-
-    cleanCache();
-    $prefs.setValue(JSON.stringify(cache), 'Sur2bCache');
-
-    // Return the final body to Quantumult X
-    $done({ body });
+  cleanCache();
+  $prefs.setValueForKey(JSON.stringify(cache), 'Sur2bCache');
+  $done({ body });
 
 })();
 
-// --- Helper Functions (Modified for Quantumult X API) ---
-
-async function sendRequest(options, method = 'get') {
-    // Quantumult X uses $task.fetch
-    options.method = method.toUpperCase();
-    
-    // Convert body object to string for POST/PUT if it's an object
-    if (options.body && typeof options.body === 'object') {
-        if (options.headers && options.headers['Content-Type'] && options.headers['Content-Type'].includes('json')) {
-            options.body = JSON.stringify(options.body);
-        }
-    }
-    
-    try {
-        const response = await $task.fetch(options);
-        // $task.fetch response object: { status, headers, body }
-        
-        let data = response.body;
-        
-        if (typeof data === 'string') {
-            try {
-                // Attempt to parse JSON
-                return JSON.parse(data);
-            } catch {
-                // Return as string if not JSON
-                return data;
-            }
-        }
-        
-        // Return body if it's already an object/array (e.g., from a JSON response)
-        return data;
-
-    } catch (error) {
-        // Quantumult X error handling in fetch
-        throw new Error(`Request failed: ${error}`);
-    }
-};
-
 async function summarizer() {
+  if (cache[videoID]?.[sourceLang]?.summary) {
+    $notify('YouTube 视频摘要', '', cache[videoID][sourceLang].summary.content);
+    return;
+  };
 
-    // Use $notify for notifications
-    if (cache[videoID]?.[sourceLang]?.summary) {
-        $notify('YouTube 视频摘要', '', cache[videoID][sourceLang].summary.content);
-        return cache[videoID][sourceLang].summary.content; // Must return content for cache hit logic
-    };
+  if (!conf.openAIProxyUrl || !conf.openAIAPIKey || !conf.openAIModel) {
+    $notify('YouTube 视频摘要', '', '未配置 OpenAI 接口信息');
+    return;
+  }
 
-    const options = {
-        url: conf.openAIProxyUrl,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + conf.openAIAPIKey
-        },
-        // In Quantumult X, 'body' for $task.fetch is the request payload
-        body: {
-            model: conf.openAIModel,
-            messages: [
-                {
-                    role: 'user',
-                    content: conf.summaryPrompts.replace(/{{subtitles}}/, subtitleData.processedText)
-                }
-            ]
+  const options = {
+    url: conf.openAIProxyUrl,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + conf.openAIAPIKey
+    },
+    body: {
+      model: conf.openAIModel,
+      messages: [
+        {
+          role: 'user',
+          content: conf.summaryPrompts.replace(/{{subtitles}}/, subtitleData.processedText)
         }
-    };
+      ]
+    }
+  };
 
-    try {
-        if (!conf.openAIProxyUrl) throw new Error('未配置 AI 总结接口链接');
-        if (!conf.openAIAPIKey) throw new Error('未配置 AI 总结接口 API Key');
-        if (!conf.openAIModel) throw new Error('未配置 AI 总结接口模型');
-
-        const resp = await sendRequest(options, 'post');
-        if (resp.error) throw new Error(resp.error.message);
-        const content = resp.choices[0].message.content;
-        $notify('YouTube 视频摘要', '', content);
-        return content;
-    } catch (err) {
-        // Quantumult X error notification
-        $notify('YouTube 视频摘要', '摘要请求失败', String(err));
-        return;
-    };
-
-};
-
+  try {
+    const resp = await sendRequest(options, 'post');
+    if (resp.error) throw new Error(resp.error.message);
+    const content = resp.choices[0].message.content;
+    $notify('YouTube 视频摘要', '', content);
+    return content;
+  } catch (err) {
+    $notify('YouTube 视频摘要', '摘要请求失败', err.message || err);
+    return;
+  }
+}
 
 async function translator() {
+  if (cache[videoID]?.[sourceLang]?.translation?.[conf.targetLanguage]) {
+    body = cache[videoID][sourceLang].translation[conf.targetLanguage].content;
+    return;
+  }
 
-    if (cache[videoID]?.[sourceLang]?.translation?.[conf.targetLanguage]) {
-        body = cache[videoID][sourceLang].translation[conf.targetLanguage].content;
-        return body; // Must return body for cache hit logic
-    };
+  const regex = /<p t="\d+" d="\d+">([^<]+)<\/p>/g;
+  const originalSubs = [];
+  let match;
+  while ((match = regex.exec(body)) !== null) originalSubs.push(match[1]);
+  if (originalSubs.length === 0) return;
 
-    let patt = new RegExp(`&lang=${conf.targetLanguage}&`, 'i');
+  const targetSubs = [];
+  const batchSize = 50;
 
-    if (conf.targetLanguage == 'zh-CN' || conf.targetLanguage == 'ZH-HANS') patt = /&lang=zh(-Hans)*&/i;
-    if (conf.targetLanguage == 'zh-TW' || conf.targetLanguage == 'ZH-HANT') patt = /&lang=zh-Hant&/i;
-
-    if (url.includes('&tlang=') || patt.test(url)) return;
-
-    if (/&lang=zh(-Han)*/i.test(url) && /^zh-(CN|TW|HAN)/i.test(conf.targetLanguage)) return await chineseTransform();
-
-    if (autoGenSub) return;
-
-    const originalSubs = [];
-
-    const regex = /<p t="\d+" d="\d+">([^<]+)<\/p>/g;
-
-    let match;
-
-    while ((match = regex.exec(body)) !== null) {
-        originalSubs.push(match[1]);
+  for (let i = 0; i < originalSubs.length; i += batchSize) {
+    const batch = originalSubs.slice(i, i + batchSize);
+    try {
+      const translatedBatch = await translateSwitcher(batch);
+      targetSubs.push(...translatedBatch);
+    } catch (error) {
+      $notify('YouTube 视频翻译', '翻译请求失败', error.message || error);
+      return;
     }
+  }
 
-    if (originalSubs.length === 0) return;
+  let subIndex = 0;
+  const translatedBody = body.replace(regex, (fullMatch) => {
+    if (subIndex < targetSubs.length && subIndex < originalSubs.length) {
+      const originalText = originalSubs[subIndex];
+      const translatedText = targetSubs[subIndex];
+      let finalSubText;
 
-    const targetSubs = [];
-    const batchSize = 50;
+      switch (conf.subLine) {
+        case 1:
+          finalSubText = `${translatedText}\n${originalText}`;
+          break;
+        case 2:
+          finalSubText = `${originalText}\n${translatedText}`;
+          break;
+        case 0:
+        default:
+          finalSubText = translatedText;
+          break;
+      }
 
-    for (let i = 0; i < originalSubs.length; i += batchSize) {
-        const batch = originalSubs.slice(i, i + batchSize);
-        try {
-            const translatedBatch = await translateSwitcher(batch);
-            targetSubs.push(...translatedBatch);
-        } catch (error) {
-            $notify('YouTube 视频翻译', '翻译请求失败', String(error));
-            return;
-        }
-    };
+      subIndex++;
+      const attributesMatch = fullMatch.match(/<p (t="\d+" d="\d+")>/);
+      return `<p ${attributesMatch[1]}>${finalSubText}</p>`;
+    }
+    return fullMatch;
+  });
 
-    let subIndex = 0;
-    const translatedBody = body.replace(regex, (fullMatch) => {
-        if (subIndex < targetSubs.length && subIndex < originalSubs.length) {
-            const originalText = originalSubs[subIndex];
-            const translatedText = targetSubs[subIndex];
-
-            let finalSubText;
-
-            switch (conf.subLine) {
-                case 1:
-                    finalSubText = `${translatedText}\n${originalText}`;
-                    break;
-                case 2:
-                    finalSubText = `${originalText}\n${translatedText}`;
-                    break;
-                case 0:
-                default:
-                    finalSubText = translatedText;
-                    break;
-            }
-
-            subIndex++;
-
-            const attributesMatch = fullMatch.match(/<p (t="\d+" d="\d+")>/);
-            return `<p ${attributesMatch[1]}>${finalSubText}</p>`;
-        }
-
-        return fullMatch;
-    });
-
-    body = translatedBody;
-
-    return translatedBody;
-};
+  body = translatedBody;
+  return translatedBody;
+}
 
 async function translateSwitcher(subs) {
-    switch (conf.translationProvider) {
-        case 'Google':
-            return await googleTranslator(subs);
-        case 'DeepL':
-            return await deepLTranslator(subs);
-        default:
-            throw new Error(`未知的翻译服务: ${conf.translationProvider}`);
-    }
-};
+  switch (conf.translationProvider) {
+    case 'Google':
+      return await googleTranslator(subs);
+    case 'DeepL':
+      return await deepLTranslator(subs);
+    default:
+      throw new Error(`未知的翻译服务: ${conf.translationProvider}`);
+  }
+}
 
 async function googleTranslator(subs) {
-    const options = {
-        url: `https://translate.google.com/translate_a/single?client=it&dt=qca&dt=t&dt=rmt&dt=bd&dt=rms&dt=sos&dt=md&dt=gt&dt=ld&dt=ss&dt=ex&otf=2&dj=1&hl=en&ie=UTF-8&oe=UTF-8&sl=auto&tl=${conf.targetLanguage}`,
-        headers: {
-            'User-Agent': 'GoogleTranslate/6.29.59279 (iPhone; iOS 15.4; en; iPhone14,2)',
-            'Content-Type': 'application/x-www-form-urlencoded' // Must specify for form data
-        },
-        body: `q=${encodeURIComponent('<p>' + subs.join('\n<p>'))}` // Body is string form-encoded
-    };
-
-    const resp = await sendRequest(options, 'post');
-
-    if (!resp.sentences) throw new Error(`Google 翻译失败: ${JSON.stringify(resp)}`);
-
-    const combinedTrans = resp.sentences.map(s => s.trans).join('');
-
-    const splitSentences = combinedTrans.split('<p>');
-
-    const targetSubs = splitSentences
-        .filter(sentence => sentence && sentence.trim().length > 0)
-        .map(sentence => {
-            return sentence.replace(/\s*[\r\n]+\s*/g, ' ').trim();
-        });
-
-    return targetSubs;
-};
-
+  const options = {
+    url: `https://translate.google.com/translate_a/single?client=it&dt=t&dj=1&sl=auto&tl=${conf.targetLanguage}`,
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+    body: `q=${encodeURIComponent('<p>' + subs.join('\n<p>'))}`
+  };
+  const resp = await sendRequest(options, 'post');
+  if (!resp.sentences) throw new Error('Google 翻译失败');
+  const combinedTrans = resp.sentences.map(s => s.trans).join('');
+  const splitSentences = combinedTrans.split('<p>');
+  return splitSentences.filter(s => s.trim()).map(s => s.trim());
+}
 
 async function deepLTranslator(subs) {
-    if (!conf.deepLAPIKey) throw new Error('未配置 DeepL API Key');
-
-    const options = {
-        url: conf.deepLUrl || 'https://api-free.deepl.com/v2/translate',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'DeepL-Auth-Key ' + conf.deepLAPIKey,
-        },
-        body: {
-            text: subs,
-            target_lang: conf.targetLanguage
-        }
-    };
-
-    const resp = await sendRequest(options, 'post');
-
-    if (!resp.translations) throw new Error(`DeepL 翻译失败: ${JSON.stringify(resp)}`);
-
-    const targetSubs = resp.translations.map(translation => translation.text);
-
-    return targetSubs;
-};
-
-async function chineseTransform() {
-
-    let from = 'cn';
-    let to = 'tw';
-
-    if (/^zh-(CN|HANS)/i.test(conf.targetLanguage)) [from, to] = [to, from];
-
-    // Note: External script loading and eval is generally discouraged and may not work reliably in all JS environments.
-    // If OpenCC.js is a common library, consider including it as a separate module or using a native implementation if available.
-    // For Quantumult X, direct fetch and eval is the closest translation.
-    const openccJS = await sendRequest({
-        url: 'https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'
-    })
-    
-    // Safety check: ensure response is a string script
-    if (typeof openccJS === 'string') {
-        eval(openccJS);
-    } else {
-        throw new Error('Failed to load OpenCC.js for Chinese transformation.');
+  if (!conf.deepLAPIKey) throw new Error('未配置 DeepL API Key');
+  const options = {
+    url: conf.deepLUrl || 'https://api-free.deepl.com/v2/translate',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'DeepL-Auth-Key ' + conf.deepLAPIKey
+    },
+    body: {
+      text: subs,
+      target_lang: conf.targetLanguage
     }
-
-    // After eval, OpenCC should be defined globally
-    const converter = OpenCC.Converter({ from: from, to: to });
-
-    body = converter(body)
-};
-
-// --- Unmodified Helper Functions (Independent of API) ---
+  };
+  const resp = await sendRequest(options, 'post');
+  if (!resp.translations) throw new Error('DeepL 翻译失败');
+  return resp.translations.map(t => t.text);
+}
 
 function processTimedText(xml) {
-    const regex = /<p t="(\d+)"[^>]*>(.*?)<\/p>/gs;
-
-    let match;
-    let maxT = 0;
-    const results = [];
-
-    while ((match = regex.exec(xml)) !== null) {
-        const t = parseInt(match[1], 10);
-        const content = match[2].trim();
-        let lineText = '';
-
-        if (content.startsWith('<s')) {
-            const sTagRegex = /<s[^>]*>([^<]+)<\/s>/g;
-            const words = Array.from(content.matchAll(sTagRegex), m => m[1]);
-            if (words.length > 0) {
-                lineText = words.join('');
-            }
-        } else {
-            lineText = content;
-        }
-
-        lineText = decodeHTMLEntities(lineText).trim();
-
-        if (lineText) {
-            if (t > maxT) {
-                maxT = t;
-            }
-
-            const totalSeconds = Math.floor(t / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            const paddedSeconds = String(seconds).padStart(2, '0');
-            let formattedTime;
-
-            if (hours > 0) {
-                const paddedMinutes = String(minutes).padStart(2, '0');
-                formattedTime = `(${hours}:${paddedMinutes}:${paddedSeconds})`;
-            } else {
-                formattedTime = `(${minutes}:${paddedSeconds})`;
-            }
-
-            results.push(`${formattedTime} ${lineText}`);
-        }
+  const regex = /<p t="(\d+)"[^>]*>(.*?)<\/p>/gs;
+  let match, maxT = 0;
+  const results = [];
+  while ((match = regex.exec(xml)) !== null) {
+    const t = parseInt(match[1], 10);
+    const content = match[2].trim();
+    let lineText = '';
+    if (content.startsWith('<s')) {
+      const sTagRegex = /<s[^>]*>([^<]+)<\/s>/g;
+      const words = Array.from(content.matchAll(sTagRegex), m => m[1]);
+      if (words.length > 0) lineText = words.join('');
+    } else lineText = content;
+    lineText = decodeHTMLEntities(lineText).trim();
+    if (lineText) {
+      if (t > maxT) maxT = t;
+      const totalSeconds = Math.floor(t / 1000);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      const paddedSeconds = String(seconds).padStart(2, '0');
+      results.push(`(${minutes}:${paddedSeconds}) ${lineText}`);
     }
-
-    const processedText = results.join('\n');
-
-    return {
-        processedText: processedText,
-        maxT: maxT
-    };
-};
+  }
+  return { processedText: results.join('\n'), maxT };
+}
 
 function decodeHTMLEntities(text) {
-    const entities = {
-        '&amp;': '&',
-        '&lt;': '<',
-        '&gt;': '>',
-        '&quot;': '"',
-        '&#39;': '\''
-    };
-    return text.replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, match => entities[match]);
-};
+  const entities = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': '\'' };
+  return text.replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, m => entities[m]);
+}
 
+function sendRequest(options, method = 'get') {
+  options.method = method.toUpperCase();
+  if (typeof options.body === 'object') options.body = JSON.stringify(options.body);
+  return $task.fetch(options).then(resp => {
+    try {
+      return JSON.parse(resp.body);
+    } catch {
+      return resp.body;
+    }
+  });
+}
 
 function cleanCache() {
-    const now = Date.now();
-    const maxMs = conf.cacheMaxHours * 60 * 60 * 1000;
-
-    for (const itemKey of Object.keys(cache)) {
-        const item = cache[itemKey];
-
-        for (const lang of Object.keys(item)) {
-            const langObj = item[lang];
-
-            if (langObj.summary && now - langObj.summary.timestamp > maxMs) {
-                delete langObj.summary;
-            };
-
-            if (langObj.translation) {
-
-                for (const tLang of Object.keys(langObj.translation)) {
-                    const tObj = langObj.translation[tLang];
-                    if (now - tObj.timestamp > maxMs) {
-                        delete langObj.translation[tLang];
-                    };
-                };
-
-                if (Object.keys(langObj.translation).length === 0) {
-                    delete langObj.translation;
-                };
-            };
-
-            if ((!langObj.summary) && (!langObj.translation)) delete item[lang];
-        };
-
-        if (Object.keys(item).length === 0) delete cache[itemKey];
-    };
-
-    return cache;
+  const now = Date.now();
+  const maxMs = conf.cacheMaxHours * 60 * 60 * 1000;
+  for (const itemKey of Object.keys(cache)) {
+    const item = cache[itemKey];
+    for (const lang of Object.keys(item)) {
+      const langObj = item[lang];
+      if (langObj.summary && now - langObj.summary.timestamp > maxMs) delete langObj.summary;
+      if (langObj.translation) {
+        for (const tLang of Object.keys(langObj.translation)) {
+          const tObj = langObj.translation[tLang];
+          if (now - tObj.timestamp > maxMs) delete langObj.translation[tLang];
+        }
+        if (Object.keys(langObj.translation).length === 0) delete langObj.translation;
+      }
+      if (!langObj.summary && !langObj.translation) delete item[lang];
+    }
+    if (Object.keys(item).length === 0) delete cache[itemKey];
+  }
+  return cache;
 }
