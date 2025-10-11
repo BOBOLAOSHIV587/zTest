@@ -6,15 +6,7 @@
 使用声明：此脚本仅供学习与交流，请在下载使用24小时内删除！请勿在中国大陆转载与贩卖！
 *******************************
 [rewrite_local]
-# > 波点音乐 会员调试 + 去广告 + 下载功能 + 付费专辑
-#^https?:\/\/(bd-api\.kuwo\.cn\/api\/(ucenter\/users\/(pub|login)|play\/(advert\/info|music\/v2\/(audioUrl|checkRight))|service\/(home\/module|music\/download\/info|global\/config\/(scene|vipEnter)|advert\/config|banner\/positions)|search\/topic\/word\/list|pay\/(vip\/(lowPriceText|invitation\/(assist\/popup|swell))|audition\/url|sp\/actVip))|us\.l\.qq\.com\/exapp\?adposcount) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Ad.js
-
-https:\/\/www.youtube.com\/api\/timedtext\? url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Ad.js
-
-https:\/\/www.youtube.com\/api\/timedtextConf url script-request-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Ad.js
-
-
-
+^https:\/\/www\.youtube\.com\/api\/timedtext url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Sur2b.js
 
 [mitm]
 hostname = www.youtube.com
