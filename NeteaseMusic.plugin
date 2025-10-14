@@ -1,117 +1,72 @@
-#!name = 网易云音乐
-#!desc = 网易云音乐全面净化
-#!openUrl = https://apps.apple.com/app/id590338362
-#!author = RuCu6[https://github.com/RuCu6], Keywos[https://github.com/Keywos], qiuxiuya[https://github.com/qiuxiuya], anyehttp[https://github.com/anyehttp], 可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md]
-#!tag = 去广告, 解锁会员
+#!name = 腾讯视频
+#!desc = 不负好时光 [不负好广告]
+#!openUrl = https://apps.apple.com/app/id458318329
+#!author = RuCu6[https://github.com/RuCu6]
+#!tag = 去广告
 #!system = 
 #!system_version = 
-#!loon_version = 3.2.9(837)
+#!loon_version = 3.3.4(898)
 #!homepage = https://github.com/sooyaaabo/Loon/blob/main/README.md
-#!icon = https://raw.githubusercontent.com/sooyaaabo/Loon/main/Icon/App-Icon/NeteaseMusic.png
-#!date = 2025-03-21 23:00
+#!icon = https://raw.githubusercontent.com/sooyaaabo/Loon/main/Icon/App-Icon/TencentVideo.png
+#!date = 2025-09-18 12:00
 
-# 2025-02-17 02:24:04
-# https://raw.githubusercontent.com/Keywos/rule/main/script/wy/wy.plugin
-# 2023-08-23 
-# https://github.com/qiuxiuya/qiuxiuya/blob/main/Loon/NetEaseMusic.plugin
-# 2025-02-28 20:08:47
-# https://kelee.one/Tool/Loon/Plugin/NeteaseCloudMusic_remove_ads.plugin
-# 2024-10-01
-# https://raw.githubusercontent.com/anyehttp/quantumult-x/main/headers/wyy-surge.sgmodule
-
-[Argument]
-FX = switch, false, true, tag = 隐藏[底部-发现], desc = 是否隐藏底部发现标签
-MY = switch, false, true, tag = 隐藏[底部-漫游], desc = 是否隐藏底部漫游标签
-DT = switch, false, true, tag = 隐藏[底部-笔记], desc = 是否隐藏底部笔记标签
-
-PRGG = switch, false, true, tag = 隐藏[首页-问候语], desc = 是否隐藏首页问候语
-PRRK = switch, false, true, tag = 隐藏[首页-排行榜], desc = 是否隐藏首页排行榜
-PRDRD = switch, false, true, tag = 隐藏[首页-每日推荐], desc = 是否隐藏首页每日推荐
-PRSCVPT = switch, false, true, tag = 隐藏[首页-推荐歌单], desc = 是否隐藏首页推荐歌单
-PRST = switch, false, true, tag = 隐藏[首页-最近常听], desc = 是否隐藏首页最近常听
-PRRR = switch, false, true, tag = 隐藏[首页-雷达歌单], desc = 是否隐藏首页雷达歌单
-HMPR = switch, false, true, tag = 隐藏[首页-音乐合伙人], desc = 是否隐藏首页音乐合伙人
-PRMST = switch, false, true, tag = 隐藏[首页-推荐专属歌单], desc = 是否隐藏首页专属歌单
-PRCN = switch, false, true, tag = 隐藏[首页-你的专属歌单], desc = 是否隐藏首页你的专属歌单
-
-Music163_VIP_Shared = switch, false, true, tag = 启用[共享会员], desc = 是否启用网易云音乐共享会员
+# https://raw.githubusercontent.com/RuCu6/QuanX/main/Rewrites/Cube/cnftp.snippet
+# https://raw.githubusercontent.com/fmz200/wool_scripts/main/Loon/rule/TencentVideo.list
 
 [Rule]
-DOMAIN, iadmat.nosdn.127.net, REJECT
-DOMAIN, iadmatapk.nosdn.127.net, REJECT
-DOMAIN, iadmusicmat.music.126.net, REJECT
-DOMAIN, iadmusicmatvideo.music.126.net, REJECT
-DOMAIN, ipv4.music.163.com, REJECT
-DOMAIN, ipv6.music.163.com, REJECT
+AND, ((IP-CIDR, 0.0.0.0/0, no-resolve), (USER-AGENT, "live4iphoneRel*")), REJECT-DROP
+
+DOMAIN, adsmind.gdtimg.com, REJECT
+DOMAIN, info4.video.qq.com, REJECT
+DOMAIN, info6.video.qq.com, REJECT
+DOMAIN, ios.video.mpush.qq.com, REJECT
+DOMAIN, otheve.beacon.qq.com, REJECT
+DOMAIN, pgdt.gtimg.cn, REJECT
+DOMAIN, tpns.qq.com, REJECT
+DOMAIN, vv6.video.qq.com, REJECT
+DOMAIN-SUFFIX, gdt.qq.com, REJECT
+DOMAIN-SUFFIX, l.qq.com, REJECT
+DOMAIN-KEYWORD, trace.qq.com, REJECT
+DOMAIN-KEYWORD, trace.video.qq.com, REJECT
+IP-CIDR, 47.110.187.87/32, REJECT, no-resolve
+URL-REGEX, "^http:\/\/[\d\.:]*\/?(defaultts\.tc|vmind\.qqvideo\.tc|finderpdd\.video)\.qq\.com\/\w+", REJECT
+URL-REGEX, "^http:\/\/apd-vlive\.apdcdn\.tc\.qq\.com\/vmind\.qqvideo\.tc\.qq\.com\/\w+", REJECT
+URL-REGEX, "^http:\/\/apd-\w+\.v\.smtcdns\.com\/(defaultts|omts|vmind\.qqvideo)\.tc\.qq\.com\/\w+", REJECT
+
+DOMAIN, ugchsy.gtimg.com, REJECT
+DOMAIN, rmonitor.qq.com, REJECT
+DOMAIN, activity.video.qq.com, REJECT
+DOMAIN, iacc.qq.com, REJECT
+DOMAIN, tux.qq.com, REJECT
+DOMAIN, aegis.qq.com, REJECT
+DOMAIN, rdelivery.qq.com, REJECT
+DOMAIN-SUFFIX, static-res.qq.com, REJECT
+DOMAIN-SUFFIX, gdtimg.com, REJECT
+DOMAIN-SUFFIX, l.qq.com, REJECT
+DOMAIN-SUFFIX, gdt.qq.com, REJECT
+DOMAIN-SUFFIX, video.mpush.qq.com, REJECT
+DOMAIN-SUFFIX, api.poll.video.qq.com, REJECT
+DOMAIN-SUFFIX, tpns.tencent.com, REJECT
+DOMAIN-SUFFIX, omgmta.qq.com, REJECT
+DOMAIN-SUFFIX, omgmta1.qq.com, REJECT
+DOMAIN-KEYWORD, track.qq.com, REJECT
+DOMAIN-KEYWORD, trace.qq.com, REJECT
+DOMAIN-KEYWORD, pgdt.gtimg.c, REJECT
+DOMAIN-KEYWORD, trace.video.qq.com, REJECT
+DOMAIN-KEYWORD, 1258344696.file.myqcloud.com, REJECT
+IP-CIDR, 183.201.213.194/32, REJECT, no-resolve
+IP-CIDR, 120.222.144.64/32, REJECT, no-resolve
+IP-CIDR, 111.6.166.107/32, REJECT, no-resolve
 
 [Rewrite]
-# 新版加密通用
-# ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/e?api\/(?:batch|v\d\/resource\/comment\/floor\/get|homepage\/block\/page|link\/page\/rcmd\/(block\/resource\/multi\/refresh|resource\/show)|user\/follow\/users\/mixed\/get|link\/home\/framework\/tab|link\/position\/show\/resource|link\/page\/discovery\/resource\/show) header-del x-aeapi
-
-# 开屏广告
-^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/e?api\/(ocpc\/)?ad\/ mock-response-body data-type=text
-
-# 今日运势 商城 Beat专区 音乐收藏家 | type:ACTIVITY | 低至5.2折
-^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/(?:delivery\/(batch-)?deliver|moment\/tab\/info\/|side-bar\/mini-program\/music-service\/account|yunbei\/account\/entrance\/) reject-dict
-
-# 播放页 歌名下方 乐迷团｜关注｜播放页提示｜音乐应用红点｜播放提示
-^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/(?:community\/friends\/fans-group\/artist\/group\/|mine\/applet\/redpoint|music\/songshare\/text\/recommend\/|resniche\/position\/play\/new\/|resniche\/tspopup\/show|resource\/comments?\/musiciansaid\/|user\/sub\/artist) reject-dict
-^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/(?:ios\/version|mlivestream\/entrance\/playpage\/|link\/position\/show\/strategy|link\/scene\/show\/resource|v1\/content\/exposure\/comment\/banner\/) reject-dict
-
-# 搜索页 搜索词 热搜卡片 猜你喜欢 我的应用下方提醒
-^https?:\/\/(?:ipv4|interface\d?)\.music\.163.com\/w?e?api\/search\/default mock-response-body data-type=text
-^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/w?eapi\/(?:activity\/bonus\/playpage\/time\/query|resource-exposure\/|search\/(?:chart\/|rcmd\/keyword\/|specialkeyword\/)) reject-dict
-
-# 主页播客推荐
-^https:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/my\/podcast\/tab\/recommend reject-dict
+^http:\/\/[\d\.:]*\/?(defaultts\.tc|vmind\.qqvideo\.tc|finderpdd\.video)\.qq\.com\/\w+ reject
+^http:\/\/apd-vlive\.apdcdn\.tc\.qq\.com\/vmind\.qqvideo\.tc\.qq\.com\/\w+ reject
+^http:\/\/apd-\w+\.v\.smtcdns\.com\/(defaultts|omts|vmind\.qqvideo)\.tc\.qq\.com\/\w+ reject
+^https?:\/\/vv\.video\.qq\.com\/(diff|get)vmind reject-dict
+^https?:\/\/vv\.video\.qq\.com\/getvinfo request-body-replace-regex &sppreviewtype=\d(.*)&spsrt=\d &sppreviewtype=0$1&spsrt=0
 
 [Script]
-#----------  qiuxiuya ----------#
-# 解锁黑胶音乐
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/.*(player\/url|entrance|\/eapi\/search\/) script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, timeout = 60, enable = {Music163_VIP_Shared}, tag = 黑胶会员
-
-#----------  会员解锁 ----------#
-# 播放会员歌曲
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/(?:v1\/artist\/top\/song|v3\/discovery\/recommend\/songs) script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 播放会员歌曲
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/v3\/song\/detail script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 播放会员歌曲
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/song\/(?:chorus|enhance\/|play\/|type\/detail\/get) script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 播放会员歌曲
-
-# 播放器会员皮肤
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/playermode\/ script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 播放器会员皮肤
-
-# 搜索结果会员歌曲
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/search\/(?:complex\/page|complex\/rec\/song\/get|song\/list\/page) script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 搜索结果会员歌曲
-
-# 侧边栏会员等级
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/vipnewcenter\/app\/resource\/newaccountpage script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 侧边栏会员等级
-
-# 歌单列表会员认证
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/w?e?api\/(?:homepage\/|v6\/)?playlist\/(?!(?:delete|subscribe|unsubscribe)) script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 歌单列表会员认证
-
-# 会员认证
-http-request ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/vipauth\/app\/auth\/(soundquality\/)?query script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/CloudMusicVIP.js, requires-body = false, binary-body-mode = false, timeout = 20, enable = {Music163_VIP_Shared}, tag = 会员认证
-
-#----------  广告过滤 ----------#
-# 热推、有话想说、分享一下、歌曲下的祝福等小提示、评论区、乐迷、星评等级、关注等图标
-http-response ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/(?:batch|v2\/resource\/comment\/floor\/get) script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/wyres.js, requires-body = true, binary-body-mode = true, timeout = 20, tag = 评论区
-
-# 推荐、home、主页
-http-response ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/(?:homepage\/block\/page|link\/page\/rcmd\/(?:block\/resource\/multi\/refresh|resource\/show)) script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/wyres.js, requires-body = true, binary-body-mode = true, timeout = 20, tag = 主页, argument=[{PRGG},{PRRK},{PRDRD},{PRSCVPT},{PRST},{PRRR},{HMPR},{PRMST},{PRCN}]
-
-# 底部Tab
-http-response ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/link\/home\/framework\/tab script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/wyres.js, requires-body = true, binary-body-mode = true, timeout = 20, tag = 底部Tab, argument=[{MY},{DT},{FX}]
-
-# 发现页
-http-response ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/link\/page\/discovery\/resource\/show script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/wyres.js, requires-body = true, binary-body-mode = true, timeout = 20, tag = 发现页
-
-# 播放音效
-# http-response ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/song\/play\/more\/list\/v\d script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/wyres.js, requires-body = true, binary-body-mode = true, timeout = 20, tag = 播放音效
-
-# 我的页面
-http-response ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/link\/position\/show\/resource script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/wyres.js, requires-body = true, binary-body-mode = true, timeout = 20, tag = 我的页面
-
-# 显示未关注你的人
-http-response ^https?:\/\/(?:ipv4|interface\d?)\.music\.163\.com\/eapi\/user\/follow\/users\/mixed\/get script-path = https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/refs/heads/main/JS/NeteaseCloudMusic/JS/JS-4/wyres.js, requires-body = true, binary-body-mode = true, timeout = 20, tag = 显示未关注你的人
+http-request ^https?:\/\/vv\.video\.qq\.com\/getvinfo script-path = https://raw.githubusercontent.com/sooyaaabo/Loon/main/Script/CommonScript/replace-body.js, requires-body = true, tag = [腾讯视频]移除广告, argument="&sppreviewtype=\d(.*)&spsrt=\d->&sppreviewtype=0$1&spsrt=0"
 
 [MitM]
-hostname = interface*.music.163.com, ipv4.music.163.com
+hostname = vv.video.qq.com
