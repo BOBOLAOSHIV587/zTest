@@ -22,7 +22,7 @@ hostname = xueshu.fun
 const config = {
   HOST: 'https://xueshu.fun',
   // === 在这里填 Cookie（或在 QX/Surge 中使用脚本变量注入） ===
-  COOKIE: '', // 示例: 'PHPSESSID=xxx; laravel_session=yyy; ...'
+  COOKIE: 'wordpress_63c6d91ecc476e0b2b0f7d9535c9cc65=bobolaoshi%7C1762106525%7CTPfhZDO7hhflvcOvfJdpbPJ6ktyFfEnB3MtkxyLkD1W%7C83c3ae863060169a4c186163e2216228329796292ce0294dc723ee77fb518', // 示例: 'PHPSESSID=xxx; laravel_session=yyy; ...'
   // 可选自定义 UA
   UA: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
   // 请求超时（ms）
