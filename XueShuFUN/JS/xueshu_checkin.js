@@ -1,14 +1,16 @@
-/****************************************
- xueshu_checkin_autoread.js
- 自动读取本地 XUESHU_COOKIE 并尝试签到，支持 QX/Surge/Loon
- 解析并在签到成功时发送通知（显示积分/连续天数/原始消息）
-****************************************/
-const KEY = 'XUESHU_COOKIE';
+/***********************************************
+ xueshu_checkin_qx.js
+ 自动读取 XUESHU_COOKIE 并签到（Quantumult X）
+ 兼容性：QX 原生（$task.fetch）与其它环境回退
+ Key: XUESHU_COOKIE
+***********************************************/
+const KEY = 'wordpress_63c6d91ecc476e0b2b0f7d9535c9cc65=bobolaoshi%7C1762106525%7CTPfhZDO7hhflvcOvfJdpbPJ6ktyFfEnB3MtkxyLkD1W%7C83c3ae863060169a4c186163e2216228329796292ce0294dc723ee77fb518'; // 若你用别的 key，请修改这里
 
-// 读取 cookie（多运行时兼容）
+// 读取 Cookie（QX 偏好 / Surge 持久化 兼容）
 function readCookie() {
   try {
     if (typeof $prefs !== 'undefined' && typeof $prefs.valueForKey === 'function') {
+      // QX: setValueForKey / valueForKey
       return $prefs.valueForKey(KEY) || $prefs.valueForKey(KEY);
     }
     if (typeof $persistentStore !== 'undefined' && typeof $persistentStore.read === 'function') {
@@ -21,155 +23,150 @@ function readCookie() {
   return null;
 }
 
-const cookie = readCookie();
-if (!cookie || cookie.trim() === '') {
-  notify('学术FUN 签到失败', '', '未找到 Cookie，请先登录网站以触发 Cookie 获取脚本');
-  done();
+function notify(title, subtitle, message) {
+  if (typeof $notify === 'function') $notify(title, subtitle, message);
+  else console.log(title, subtitle, message);
 }
+function done(v){ if (typeof $done === 'function') $done(v); }
 
-// 常见候选签到接口（按优先级）
-const CANDIDATES = [
-  'https://xueshu.fun/user/checkin',
-  'https://xueshu.fun/checkin',
-  'https://xueshu.fun/api/checkin',
-  'https://xueshu.fun/user/signin',
-  'https://xueshu.fun/signin'
-];
-
-const headers = {
-  'Cookie': cookie,
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-  'Referer': 'https://xueshu.fun/',
-  'X-Requested-With': 'XMLHttpRequest',
-  'Accept': 'application/json, text/javascript, */*; q=0.01'
-};
-
+// 主逻辑
 (async () => {
-  for (const url of CANDIDATES) {
+  const cookie = readCookie();
+  if (!cookie) {
+    notify('学术FUN 签到', '失败', '未检测到 Cookie（XUESHU_COOKIE）。请先登录并保存 Cookie）');
+    return done();
+  }
+
+  const headers = {
+    'Cookie': cookie,
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+    'Referer': 'https://xueshu.fun/',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Accept': 'application/json, text/javascript, */*; q=0.01'
+  };
+
+  // 常见候选接口（按优先级）
+  const candidates = [
+    'https://xueshu.fun/user/checkin',
+    'https://xueshu.fun/checkin',
+    'https://xueshu.fun/api/checkin',
+    'https://xueshu.fun/user/signin',
+    'https://xueshu.fun/signin'
+  ];
+
+  for (const url of candidates) {
     try {
-      const resp = await httpFetch('POST', url, headers);
-      const body = (resp && resp.body) ? resp.body : '';
-      // 若 HTTP 状态非 200 也查看 body（某些站点会重定向）
-      if (!body || body.length === 0) {
-        // 如果 POST 无返回，再尝试 GET
-        const g = await httpFetch('GET', url, headers);
-        if (g && g.body) {
-          if (await checkSuccess(g.body)) { return; }
-        }
-        continue;
-      }
-      if (await checkSuccess(body)) return;
+      // 先尝试 POST
+      const resp = await fetchUrl('POST', url, headers);
+      const body = resp && resp.body ? resp.body : '';
+      if (await isSuccess(body)) return done();
+
+      // 若 POST 无效，尝试 GET
+      const resp2 = await fetchUrl('GET', url, headers);
+      const body2 = resp2 && resp2.body ? resp2.body : '';
+      if (await isSuccess(body2)) return done();
     } catch (e) {
-      // ignore, 继续下一个候选
+      // 忽略错误，继续下一个候选
     }
   }
-  notify('学术FUN 签到失败', '', '尝试了常见接口均未成功。请手动签到并把响应返回体发给我以便定制。');
+
+  // 全部候选失败
+  notify('学术FUN 签到', '失败', '尝试了常见接口均未成功。如可，请抓取一次签到请求的 Response body 贴给我以便定制。');
   done();
 })();
 
-// 检查是否成功并通知（尝试解析 JSON 或文本）
-async function checkSuccess(body) {
+// 判断是否成功并通知（解析 JSON 或文本）
+async function isSuccess(body) {
   const text = (typeof body === 'string') ? body : JSON.stringify(body);
-  // 1) 尝试解析 JSON
+  if (!text || text.length === 0) return false;
+
+  // 尝试解析 JSON
   try {
     const j = JSON.parse(text);
-    // 常见成功条件：code===0 或 success===true 等
-    if (j && (j.code === 0 || j.code === '0' || j.success === true || j.success === 'true' || /success/i.test(j.status || ''))) {
-      const info = formatInfoFromJson(j);
+    // 常见成功判断： code===0 或 success===true 或 msg 包含 成功关键词
+    const msgField = j.msg || j.message || '';
+    if (j.code === 0 || j.code === '0' || j.success === true || j.success === 'true' || /success/i.test(j.status || '')) {
+      const info = formatJsonInfo(j);
       notify('🎉 学术FUN 签到成功', '', info);
       return true;
     }
-    // 有些站点在 message / msg 字段说明签到成功
-    const msg = j.msg || j.message || '';
-    if (msg && /签到成功|已签到|success|OK/i.test(String(msg))) {
-      const info = formatInfoFromJson(j);
+    if (msgField && /签到成功|已签到|success|OK/i.test(String(msgField))) {
+      const info = formatJsonInfo(j);
       notify('🎉 学术FUN 签到成功', '', info);
       return true;
     }
-    // 如果 JSON 包含可识别的 data 字段内信息也视为成功（尝试查找关键词）
+    // 若 JSON 包含关键词也可视为成功（保险判断）
     if (JSON.stringify(j).match(/签到成功|已签到|获得|积分|连续/)) {
-      const info = formatInfoFromJson(j);
+      const info = formatJsonInfo(j);
       notify('🎉 学术FUN 签到（可能）', '', info);
       return true;
     }
-  } catch (e) {
-    // 不是 JSON，继续文本解析
+  } catch(e) {
+    // 非 JSON，尝试文本解析
   }
 
-  // 2) 文本匹配常见成功关键词
-  if (/签到成功|已签到|今日已签到|获得奖励|已领取|success|签到完成/i.test(text)) {
-    const info = parseInfoFromText(text);
+  // 文本匹配成功关键词
+  if (/签到成功|已签到|今日已签到|获得奖励|success|签到完成/i.test(text)) {
+    const info = parseTextInfo(text);
     notify('🎉 学术FUN 签到成功', '', info);
     return true;
   }
   return false;
 }
 
-// 从 JSON 中提取可读信息
-function formatInfoFromJson(j) {
-  let lines = [];
-  if (j.msg) lines.push(String(j.msg));
-  if (j.message) lines.push(String(j.message));
-  // 优先检查 data 里常见字段
+// 从 JSON 提取信息（积分/连续/累计/消息）
+function formatJsonInfo(j) {
+  const parts = [];
+  if (j.msg) parts.push(String(j.msg));
+  if (j.message) parts.push(String(j.message));
   const d = j.data || j.result || j;
-  if (d) {
-    if (d.point || d.points || d.score) lines.push('当前积分: ' + (d.point || d.points || d.score));
-    if (d.days || d.continue || d.continuous) lines.push('连续签到: ' + (d.days || d.continue || d.continuous));
-    if (d.total || d.total_days) lines.push('累计签到: ' + (d.total || d.total_days));
-    // 若 data 为字符串或对象，加入其简短描述
-    if (typeof d === 'string') lines.push(d.slice(0, 120));
-    else if (typeof d === 'object' && !lines.length) lines.push(JSON.stringify(d).slice(0, 200));
+  if (d && typeof d === 'object') {
+    if (d.point || d.points || d.score) parts.push('积分: ' + (d.point || d.points || d.score));
+    if (d.days || d.continue || d.continuous) parts.push('连续签到: ' + (d.days || d.continue || d.continuous) + ' 天');
+    if (d.total || d.total_days) parts.push('累计签到: ' + (d.total || d.total_days));
+    // 若 data 中有自说明字段（例如 reward），尝试显示
+    if (d.reward) parts.push('奖励: ' + String(d.reward));
   }
-  if (!lines.length) lines.push(String(JSON.stringify(j)).slice(0, 200));
-  return lines.join('\n');
+  if (!parts.length) parts.push(String(JSON.stringify(j)).slice(0,150));
+  return parts.join('\n');
 }
 
-// 从 HTML / 文本中提取积分/连续天数等
-function parseInfoFromText(text) {
+// 从 HTML/纯文本中提取关键信息
+function parseTextInfo(text) {
   const clean = text.replace(/<[^>]*>/g, '\n');
-  const p = (clean.match(/积分[:：]?\s*([+-]?\d+)/) || clean.match(/获得[:：]?\s*([+-]?\d+)/));
+  const parts = [];
+  if (/签到成功|已签到|success/i.test(clean)) parts.push('✅ 签到成功');
+  const p = clean.match(/积分[:：]?\s*([+-]?\d+)/);
   const c = clean.match(/连续.{0,4}(\d+)\s*天/);
   const t = clean.match(/累计.{0,4}(\d+)\s*天/);
-  let lines = [];
-  if (/签到成功|已签到|success/i.test(clean)) lines.push('✅ 签到成功');
-  if (p) lines.push('积分: ' + p[1]);
-  if (c) lines.push('连续签到: ' + c[1] + ' 天');
-  if (t) lines.push('累计签到: ' + t[1] + ' 天');
-  if (!lines.length) lines.push(clean.slice(0, 200));
-  return lines.join('\n');
+  if (p) parts.push('积分: ' + p[1]);
+  if (c) parts.push('连续签到: ' + c[1] + ' 天');
+  if (t) parts.push('累计签到: ' + t[1] + ' 天');
+  if (!parts.length) parts.push(clean.slice(0,150));
+  return parts.join('\n');
 }
 
-// 通用请求（兼容 QX / Surge / Loon）
-function httpFetch(method, url, headers) {
+// 通用 fetch（QX: $task.fetch；回退：$httpClient）
+function fetchUrl(method, url, headers) {
   return new Promise((resolve, reject) => {
-    // Quantumult X
+    // QX
     if (typeof $task !== 'undefined' && $task.fetch) {
       $task.fetch({ method, url, headers }).then(resp => {
         resolve({ status: resp.status || resp.statusCode, body: resp.body, headers: resp.headers });
       }).catch(err => reject(err));
       return;
     }
-    // Surge / Loon
+    // Surge / Loon 回退（$httpClient）
     if (typeof $httpClient !== 'undefined') {
       const cb = (err, resp, body) => {
         if (err) return reject(err);
-        // resp.status 或 resp.statusCode 兼容
         resolve({ status: resp && (resp.status || resp.statusCode || 0), body: body, headers: resp && resp.headers });
       };
       if (method === 'POST') $httpClient.post({ url, headers }, cb);
       else $httpClient.get({ url, headers }, cb);
       return;
     }
-    // Node 环境不支持（简单reject）
+    // 不支持环境
     reject(new Error('unsupported runtime'));
   });
 }
-
-// 通知与结束封装
-function notify(title, subtitle, message) {
-  try {
-    if (typeof $notify === 'function') $notify(title, subtitle, message);
-    else console.log(`${title}\n${subtitle}\n${message}`);
-  } catch (e) { console.log(title, subtitle, message); }
-}
-function done(v) { if (typeof $done === 'function') $done(v); }
