@@ -36,8 +36,7 @@ DOMAIN-SUFFIX,jisuts.com
 
 
 #####91毒舌电影#####
-DOMAIN-SUFFIX,vip.*.com
-DOMAIN-SUFFIX,vip.*.com:443
+DOMAIN-REGEX,^vip\..*\.com$
 DOMAIN-SUFFIX,vip.ffzy-play10.com
 DOMAIN-SUFFIX,vip.dytt-movies.com
 DOMAIN-SUFFIX,vip.dytt-cine.com
