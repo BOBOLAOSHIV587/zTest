@@ -1,0 +1,12 @@
+#!name=起点读书
+#!desc=起点读书-解锁会员专享-付费未解锁。特别说明：付费未解锁，可以用mcdasheng的task签到 广告任务：https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/qidian/qidian.js
+#!category=😍BOBO Premium
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/QiDianDuShu.png
+#!openUrl=https://apps.apple.com/app/id534174796
+
+[Script]
+专业版 = type=http-response,pattern=^https://base\.ysjf\.com/storm_auth/user/self,requires-body=1,max-size=0,binary-body-mode=0,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/StormCam.js,script-update-interval=0
+
+
+[MITM]
+hostname = %APPEND% base.ysjf.com
