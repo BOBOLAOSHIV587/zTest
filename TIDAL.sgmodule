@@ -1,12 +1,18 @@
-#!name=起点读书
-#!desc=起点读书-解锁会员专享-付费未解锁。特别说明：付费未解锁，可以用mcdasheng的task签到 广告任务：https://raw.githubusercontent.com/MCdasheng/QuantumultX/main/Scripts/myScripts/qidian/qidian.js
+#!name=Spotify歌词翻译(>=iOS15)
+#!desc=Spotify歌词翻译(>=iOS15)。在编辑参数中的appid和securityKey,填入自己的appid和密钥
+#!date=2025-08-01
 #!category=😍BOBO Premium
-#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/QiDianDuShu.png
-#!openUrl=https://apps.apple.com/app/id534174796
-
-[Script]
-专业版 = type=http-response,pattern=^https://base\.ysjf\.com/storm_auth/user/self,requires-body=1,max-size=0,binary-body-mode=0,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/StormCam.js,script-update-interval=0
+#!author=app2smile[https://github.com/app2smile]
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/Spotify.png
+#!openUrl=https://apps.apple.com/app/id324684580
+#!arguments=appid:翻译api的id,securityKey:翻译api的密钥
+#!arguments-desc=appid: 填入自己申请翻api的id\n\n securityKey:填入自己申请翻译api的密钥
 
 
 [MITM]
-hostname = %APPEND% base.ysjf.com
+hostname = %APPEND% spclient.wg.spotify.com
+
+[Script]
+# 修改下方argument中的appid和securityKey,填入自己的appid和密钥
+spotify歌词翻译 = type=http-response,pattern=^https:\/\/spclient\.wg\.spotify\.com\/color-lyrics\/v2\/track\/,requires-body=1,binary-body-mode=1,max-size=0,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/Spotify-lyric/JS/Spotify-lyric.js,argument="appid={{{appid}}}&securityKey={{{securityKey}}}
+
