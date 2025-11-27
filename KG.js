@@ -12,18 +12,23 @@
 *******************************
 [rewrite_local]
 # > 番茄短剧-视频大全海量爆款短剧持续更新
-^https:\/\/8\.149\.129\.124:3002\/api\/account\/v1 url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
+^http:\/\/8.149.129.124:3002\/api\/account\/v1 url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
 
 
-[mitm]
-hostname = 8.149.129.124:3002
-*
-*
 */
 
 
-var body = $response.body; 
-let obj = JSON.parse($response.body);
-obj.id = "https://t.me/GieGie777";
-obj.vipExpiresAt = "2999-09-01T00:00:00Z"
-$done({body: JSON.stringify(obj)});
+let body = $response.body;
+if (!body) $done({});
+
+try {
+    let obj = JSON.parse(body);
+
+    obj.id = "https://t.me/GieGie777";
+    obj.vipExpiresAt = "2999-09-01T00:00:00Z";
+
+    $done({ body: JSON.stringify(obj) });
+} catch (e) {
+    console.log("fanqdj error: " + e);
+    $done({});
+}
