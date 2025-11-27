@@ -1,56 +1,29 @@
-/**
- * Endless Google Injector
- * 适配：Surge / Loon / Quantumult X
- * 功能：在 Google 搜索页注入 Endless Google 无限加载脚本
- * 作者：bobo 修改版
-
+/*
+ *
+ *
+脚本功能：番茄短剧-视频大全海量爆款短剧持续更新
+软件版本：1.2.0.1
+下载地址：
+脚本作者：
+更新时间：2025
+电报频道：https://t.me/GieGie777
+问题反馈：@liul0ng
+使用声明：此脚本仅供学习与交流，请在下载使用24小时内删除！请勿在中国大陆转载与贩卖！
+*******************************
 [rewrite_local]
-# Rewrite rule to intercept YouTube video URLs
-^https?:\/\/(www\.)?youtube\.com\/watch\?v=(.*) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
-
+# > 番茄短剧-视频大全海量爆款短剧持续更新
+^https:\/\/8\.149\.129\.124:3002\/api\/account\/v1 url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
 
 
 [mitm]
-hostname = *.youtube.com
-
+hostname = 8.149.129.124:3002
+*
+*
 */
 
-// QX Rewrite Script: YouTube Video Summary Notifier
 
-// 监听 YouTube 页面请求
-$httpClient.get('https://www.youtube.com/watch?v=([^&]+)', function(error, response, data) {
-    if (error) {
-        console.error('Error fetching YouTube video:', error);
-        return;
-    }
-
-    const videoId = extractVideoId(response.url);
-    if (videoId) {
-        // YouTube 视频 ID 提取成功，继续处理
-        showNotification('视频ID提取成功: ' + videoId);
-        
-        // 在此处可以继续添加处理视频页面内容的逻辑，获取摘要等
-    } else {
-        showNotification('无法提取视频ID');
-    }
-});
-
-// 提取视频ID的函数
-function extractVideoId(url) {
-    const urlObj = new URL(url);
-    return urlObj.searchParams.get('v');
-}
-
-// 显示通知的函数
-function showNotification(message) {
-    $notify('YouTube Gemini Summarizer', '', message);
-}
-
-// 监听请求并阻止无效的请求
-$httpClient.get('https://www.youtube.com/watch', function(error, response, data) {
-    if (error) {
-        showNotification('无法连接到YouTube');
-    } else {
-        showNotification('视频页面加载成功');
-    }
-});
+var body = $response.body; 
+let obj = JSON.parse($response.body);
+obj.id = "https://t.me/GieGie777";
+obj.vipExpiresAt = "2999-09-01T00:00:00Z"
+$done({body: JSON.stringify(obj)});
