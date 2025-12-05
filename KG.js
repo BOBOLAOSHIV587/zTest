@@ -1,34 +1,54 @@
+
 /*
- *
- *
-脚本功能：番茄短剧-视频大全海量爆款短剧持续更新
-软件版本：1.2.0.1
-下载地址：
-脚本作者：
-更新时间：2025
-电报频道：https://t.me/GieGie777
-问题反馈：@liul0ng
-使用声明：此脚本仅供学习与交流，请在下载使用24小时内删除！请勿在中国大陆转载与贩卖！
-*******************************
-[rewrite_local]
-# > 番茄短剧-视频大全海量爆款短剧持续更新
-^http:\/\/8.149.129.124:3002\/api\/account\/v1 url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
+网易云音乐 Cookie / UA / MConfigInfo 提取器（Surge MITM 版）
+作者：Qwen
+适用：Surge 4+，需开启 music.163.com 域名 MITM
 
+[MITM]
+hostname = %APPEND% music.163.com, interface3.music.163.com
 
+[Script]
+# 或远程脚本（替换为你的 raw URL）
+http-request ^https?:\/\/(interface3\.|music\.)?music\.163\.com\/ script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=false, timeout=10, enable=true
 */
 
+// 判断是否为网易云音乐相关域名
+if (
+  /^https?:\/\/(interface3\.|music\.)?music\.163\.com\//.test($request.url)
+) {
+  const headers = $request.headers || {};
+  
+  // 统一转小写便于查找（Surge headers key 可能大小写不一致）
+  const lowerHeaders = {};
+  for (const key in headers) {
+    lowerHeaders[key.toLowerCase()] = headers[key];
+  }
 
-let body = $response.body;
-if (!body) $done({});
+  const cookie = lowerHeaders['cookie'] || '';
+  const ua = lowerHeaders['user-agent'] || '';
+  const mconfig = lowerHeaders['mconfiginfo'] || '';
 
-try {
-    let obj = JSON.parse(body);
+  // 至少要有 Cookie 和 UA 才认为有效
+  if (cookie && ua) {
+    const data = {
+      Cookie: cookie,
+      UserAgent: ua,
+      MConfigInfo: mconfig || null
+    };
 
-    obj.id = "https://t.me/GieGie777";
-    obj.vipExpiresAt = "2999-09-01T00:00:00Z";
+    const jsonStr = JSON.stringify(data, null, 2);
+    const summary = `UA长度: ${ua.length} | Cookie长度: ${cookie.length}`;
+    const title = '🎵 网易云音乐信息已捕获';
 
-    $done({ body: JSON.stringify(obj) });
-} catch (e) {
-    console.log("fanqdj error: " + e);
-    $done({});
+    // 发送通知
+    $notification.post(title, summary, jsonStr);
+
+    // 写入剪贴板（Surge 支持）
+    $clipboard.set(jsonStr);
+
+    console.log('[NeteaseExtract] Data captured and copied to clipboard.');
+  }
 }
+
+// 必须返回响应（MITM 脚本要求）
+$done({});
