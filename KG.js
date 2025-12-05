@@ -12,13 +12,8 @@ hostname = %APPEND% music.163.com, interface3.music.163.com
 http-request ^https?:\/\/(interface3\.|music\.)?music\.163\.com\/ script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=false, timeout=10, enable=true
 */
 
-// 判断是否为网易云音乐相关域名
-if (
-  /^https?:\/\/(interface3\.|music\.)?music\.163\.com\//.test($request.url)
-) {
+if (/^https?:\/\/(interface3\.|music\.)?music\.163\.com\//.test($request.url)) {
   const headers = $request.headers || {};
-  
-  // 统一转小写便于查找（Surge headers key 可能大小写不一致）
   const lowerHeaders = {};
   for (const key in headers) {
     lowerHeaders[key.toLowerCase()] = headers[key];
@@ -28,7 +23,6 @@ if (
   const ua = lowerHeaders['user-agent'] || '';
   const mconfig = lowerHeaders['mconfiginfo'] || '';
 
-  // 至少要有 Cookie 和 UA 才认为有效
   if (cookie && ua) {
     const data = {
       Cookie: cookie,
@@ -37,18 +31,20 @@ if (
     };
 
     const jsonStr = JSON.stringify(data, null, 2);
-    const summary = `UA长度: ${ua.length} | Cookie长度: ${cookie.length}`;
-    const title = '🎵 网易云音乐信息已捕获';
+    // 编码为 data URL（兼容 Safari）
+    const encoded = encodeURIComponent(jsonStr);
+    const dataUrl = `data:application/json;charset=utf-8,${encoded}`;
 
-    // 发送通知
-    $notification.post(title, summary, jsonStr);
+    const title = "🎵 网易云信息已捕获";
+    const subtitle = `UA长度: ${ua.length} | Cookie长度: ${cookie.length}`;
+    const content = "👉 点击本通知，在浏览器中打开并复制全部内容";
 
-    // 写入剪贴板（Surge 支持）
-    $clipboard.set(jsonStr);
+    // 发送带 data URL 的通知（Surge 支持点击跳转）
+    $notification.post(title, subtitle, content, { url: dataUrl });
 
-    console.log('[NeteaseExtract] Data captured and copied to clipboard.');
+    // 同时输出到日志，方便调试
+    console.log("[NeteaseExtract] Full data:\n" + jsonStr);
   }
 }
 
-// 必须返回响应（MITM 脚本要求）
 $done({});
