@@ -1,8 +1,7 @@
 #!name=贴吧签到
-#!desc=自动签到贴吧。获取Cookie说明：打开百度贴吧A
-#!author= ClydeTime[https://github.com/ClydeTime/Quantumult]
-#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/miniColor/Image/Color/tieba.png
-#!openUrl=https://apps.apple.com/app/id477927812
+#!desc=自动签到贴吧。获取Cooki
+#!author= ClydeTime[http
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/miniColor/Image/Color/ti
 
 
 [Script]
@@ -11,7 +10,7 @@
 贴吧Cookie2 = type=http-request,pattern=^https?:\/\/c\.tieba\.baidu\.com\/c\/u\/follow\/getFoldedMessageUserInfo,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/BaiDuTieBa/JS/BaiDuTieBa.js,requires-body=0
 
 # > 贴吧签到
-贴吧签到 = type=cron,cronexp=52-55 13 * * *,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/BaiDuTieBa/JS/BaiDuTieBa.js,wake-system=1,timeout=15,script-update-interval=0
+贴吧签到 = type=cron,cronexp=00,03,05 14 * * *,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/BaiDuTieBa/JS/BaiDuTieBa.js,wake-system=1,timeout=15,script-update-interval=0
 
 
 [MITM]
