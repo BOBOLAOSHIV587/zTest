@@ -1,20 +1,20 @@
-#!name = GitHub
-#!desc = 设置Accept-Language避免429错误
-#!openUrl = 
-#!author = sooyaaabo[https://github.com/sooyaaabo]
-#!tag = 功能增强
-#!system = 
-#!system_version = 
-#!loon_version = 3.3.4(898)
-#!homepage = https://github.com/sooyaaabo/Loon/blob/Loon/README.md
-#!icon = https://raw.githubusercontent.com/sooyaaabo/Loon/main/Icon/App-Icon/GitHub-01.png
-#!date = 2025-09-18 12:00
-
-[Rewrite]
-# 私库认证
-^https?:\/\/(raw|gist)\.githubusercontent\.com\/{USERNAME} header-del Authorization
-^https?:\/\/(raw|gist)\.githubusercontent\.com\/{USERNAME} header-add Authorization "token\x20{TOKEN}"
+#!name=贴吧签到
+#!desc=自动签到贴吧。获取Cookie说明：打开百度贴吧App后, 如通知成功获取cookie, 则可以使用此签到脚本。
+#!date=2025-10-30
+#!category=😍BOBO Task
+#!author= ClydeTime[https://github.com/ClydeTime/Quantumult]
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/miniColor/Image/Color/tieba.png
+#!openUrl=https://apps.apple.com/app/id477927812
 
 
-[MitM]
-hostname = github.com, *.githubusercontent.com
+[Script]
+# > 百度贴吧 cookie
+贴吧Cookie1 = type=http-request,pattern=^https?:\/\/tiebac\.baidu\.com\/c\/u\/follow\/getFoldedMessageUserInfo,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/BaiDuTieBa/JS/BaiDuTieBa.js,requires-body=0
+贴吧Cookie2 = type=http-request,pattern=^https?:\/\/c\.tieba\.baidu\.com\/c\/u\/follow\/getFoldedMessageUserInfo,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/BaiDuTieBa/JS/BaiDuTieBa.js,requires-body=0
+
+# > 贴吧签到
+贴吧签到 = type=cron,cronexp=51-53 13 * * *,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/BaiDuTieBa/JS/BaiDuTieBa.js,wake-system=1,timeout=15,script-update-interval=0
+
+
+[MITM]
+hostname = %APPEND% tiebac.baidu.com, c.tieba.baidu.com
