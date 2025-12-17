@@ -1,92 +1,21 @@
-#!name=酷狗音乐调试
-#!desc=功能调试
-#!category=KuGoumusic
-#!author=bb
+#!name=酷我音乐签到助手
+#!desc=交互式登录与自动签到。
+#!date=2025-12-18
+#!category=😍BOBO Task
+#!author= baby[https://github.com/Yu9191]
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/KuWo.png
+#!openUrl=https://360.com/kuwo
+#!arguments=手机号:12345678910, OCR密钥:K***
+#!arguments-desc=手机号: 酷我登录手机号，用于面板自动填充 \nOCR密钥: 填写 ocr.space 的 API Key (留空则不用) \n\n安装插件&模块,编辑模块&插件填写参数，然后打开 https://360.com/kuwo ，然后获取图片二维码，然后发送和填写验证码后登录 \n\n首次会自动完成一次任务，后续缓存ck 定时运行 \n\n定时任务：每天从早上 7 点到晚上 11 点之间，每小时的第 15 分钟执行一次，可自行更改 \n\n注意事项：如果用不上不用填ocr，脚本可以通过接入 ocr.space 的 OCR API 来识别验证码图片。
 
-[Rule]
-# > (广告/弹窗)
-URL-REGEX, ^https:\/\/vipssr\.kugou\.com\/static\/js\/async\/flexPayPopup, REJECT
-URL-REGEX, ^https:\/\/gateway\.kugou\.com\/vipssr\/prepay_ios\.html, REJECT
 
-URL-REGEX, ^https:\/\/staticssl\.kugou\.com\/common\/js-lib\/vip\/dlg_ctrler_v2\.js$, REJECT
-
-URL-REGEX, ^https:\/\/h5\.kugou\.com\/apps\/vipcenter\/_next\/static\/css, REJECT
-
-URL-REGEX, ^https:\/\/vipssr\.kugou\.com\/static\/js\/vip\/newUi\/vipPageUnionIosContent-, REJECT
-
-URL-REGEX, ^https:\/\/fx\.service\.kugou\.com\/fx\/activity\/register\/center\/sidebar\/configV2$, REJECT
-
-URL-REGEX, ^https:\/\/service1\.fanxing\.kugou\.com\/video\/mo\/live\/pull\/mutiline\/cfg, REJECT
-15	+
-URL-REGEX, ^http:\/\/log\.web\.kugou\.com\/postEvent\.php$, REJECT
-16	+
-17	+
-# > (广告域名)
-18	+
-DOMAIN, webvoobssdl.kugou.com, REJECT
-19	+
-DOMAIN, ad.tencentmusic.com, REJECT
-20	+
-DOMAIN, ads.service.kugou.com, REJECT
-21	+
-DOMAIN, adsfile.kugou.com, REJECT
-22	+
-DOMAIN, mdpfilebssdlbig.kugou.com, REJECT
-23	+
-DOMAIN, adserviceretry.kugou.com, REJECT
-24	+
-25	+
-# > (开屏广告)
-26	+
-IP-CIDR, 157.255.11.247/32, REJECT, no-resolve
-27	+
-IP-CIDR, 111.206.99.202/32, REJECT, no-resolve
-28	+
-29	+
 [Script]
-30	+
-# > 用户信息
-31	+
-酷狗_用户信息 = type=http-response, pattern=^https?:\/\/(m|gateway(retry)?|loginservice|expendablekmrcdnretry)\.kugou\.com\/(v5\/login_by_token|v2\/get_login_extend_info|mobile\/vipinfoV2|v2\/get_vip_config|updateservice\/v1\/get_dev_user|v1\/login_by_quick_token|flow\/user_config\/get_level_config_ios|promotionvip\/v3\/vip_level\/detail), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-32	+
-33	+
-# > 播放权限
-34	+
-酷狗_播放res = type=http-response, pattern=^https?:\/\/(gateway(retry)?)\.kugou\.com\/(v1\/get_res_privilege\/lite|v1\/union\/audio_info), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-35	+
-酷狗_播放v5 = type=http-response, pattern=^https?:\/\/gateway\.kugou\.com\/tracker\/v5\/url, requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugouv5.js
-36	+
-37	+
-# > 移除首页横幅、侧边栏推广、顶部卡片
-38	+
-酷狗_首页净化 = type=http-response, pattern=^https?:\/\/(gateway(retry)?)\.kugou\.com\/(ssr\/decocenter\/home|ads\.gateway\/v2\/sidebar_link|ads\.gateway\/v2\/sidebar_top_card|ads\.gateway\/v2\/home_card|ads\.gateway\/v2\/mobile_link|card\/v1\/pxy\/top|card\/v1\/pxy\/recommend_stream(_v2)?), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-39	+
-40	+
-# > 播放页去广告 
-41	+
-酷狗_播放页净化 = type=http-response, pattern=^https?:\/\/(gateway(retry)?)\.kugou\.com\/(playerpxy\/v1\/combo\/play_page_index|adp\/ad\/v1\/playpage_combine|els\.abt\/v1\/tmeab), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-42	+
-43	+
-# > 移除搜索栏插图、短剧视频流、任务中心视频
-44	+
-酷狗_搜索短剧 = type=http-response, pattern=^https?:\/\/(gateway(retry)?)\.kugou\.com\/(searchnofocus\/v1\/search_no_focus_word|ads\.gateway\/v4\/search_banner|card\/v1\/pxy\/listen|ads\.gateway\/v5\/task_video\/qualification), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-45	+
-46	+
-# > 移除个人中心横幅、星光卡活动、盲盒弹窗
-47	+
-酷狗_我的页面 = type=http-response, pattern=^https?:\/\/(gateway(retry)?|gateway3)\.kugou\.com\/(adp\/ad\/v1\/mine_top_banner|v1\/starlight\/get_campaign_infos|pendant\/v2\/get_user_pendant|v1\/blindbox_cabinet\/client_cabinet), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-48	+
-49	+
-# > App图标
-50	+
-酷狗_图标 = type=http-response, pattern=^https?:\/\/(gateway(retry)?)\.kugou\.com\/(ads\.gateway\/v2\/task_center_entrance|ocean\/v6\/theme\/category|tools\.mobile\/v2\/theme\/info), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-51	+
-52	+
-# > 处理开屏数据(部分)、支付中心弹窗
-53	+
-酷狗_杂项净化 = type=http-response, pattern=^https?:\/\/(gateway(retry)?|ads\.service)\.kugou\.com\/(v4\/mobile_splash(_sort)?|pxy\/v1\/combo\/startup|v3\/vip_center), requires-body=true, max-size=0, script-path=https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/kugou.js
-54	+
-55	+
+# > 酷我音乐签到助手
+酷我登录控制台 = type=http-request, pattern=^https?:\/\/360\.com\/kuwo, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/KuWoTask/JS/JS-1/KuWoTask.js, requires-body=true, timeout=120, tag=酷我登录控制台, argument=phone={{{手机号}}}&ocr={{{OCR密钥}}}
+
+酷我自动签到 = type=cron, cronexp="15 7-23/1 * * *", script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Task/KuWoTask/JS/JS-1/KuWoTask.js, timeout=120, tag=酷我自动签到
+
+
 [MITM]
-56	+
-hostname = m.kugou.com, gateway.kugou.com, gatewayretry.kugou.com, gateway3.kugou.com, ads.service.kugou.com, welfare.kugou.com, fx.service.kugou.com, hwstore.kugou.com, loginservice.kugou.com, expendablekmrcdnretry.kugou.com, adservice.kugou.com
+hostname = %APPEND% 360.com
+
