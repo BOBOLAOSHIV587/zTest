@@ -1,0 +1,8 @@
+[Script]
+http-response ^https?://haijiao\.com/(signin|user) tag=海角Cookie script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Cookie/Cookie.js
+
+[cron]
+0 9 * * * https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Cookie/Sign.js, tag=海角签到
+
+[MITM]
+hostname = haijiao.com
