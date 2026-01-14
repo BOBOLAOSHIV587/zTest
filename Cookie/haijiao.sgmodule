@@ -1,7 +1,0 @@
-[MITM]
-hostname = %APPEND% haijiao.com
-
-[Script]
-http-response ^https?://haijiao\.com/(signin|user) requires-body=false, max-size=0, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Cookie/Cookie.js, type=http-response
-
-海角签到 = type=cron,cronexp="0 9 * * *",script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Cookie/Sign.js
