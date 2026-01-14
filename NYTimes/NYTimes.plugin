@@ -1,0 +1,13 @@
+#!name=AGC Video Player
+#!desc=AGC解锁会员1-17
+#!date=2025-08-01
+#!category=😍BOBO Premium
+#!author=baby[https://github.com/Yu9191]
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/AGC.png
+#!openUrl=https://apps.apple.com/app/id6670426427
+
+[Script]
+http-response https://myaccount.nytimes.com/svc/ecommerce/entitlements/itunes/nyt script-path= https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/NYTimes/JS/NYTimes.js, requires-body=true, timeout=60, tag=NYTimes
+
+[MITM]
+hostname = myaccount.nytimes.com
