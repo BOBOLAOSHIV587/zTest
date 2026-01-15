@@ -1,0 +1,15 @@
+#!name=TOR Browser
+#!desc=解锁VIP
+#!date=2026-01-16
+#!category=🐹 BOBO Premium
+#!author= Yarmukhamedov[https://github.com/Yarmukhamedov/mitm]
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/TVOЁ.png
+#!openUrl=https://apps.apple.com/app/id6469774405
+
+[Script]
+# > TOR Browser-解锁VIP
+http-response https://buy.itunes.apple.com/verifyReceipt script-path= https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=60, tag=TOR Browser
+
+[MITM]
+hostname = buy.itunes.apple.com
+
