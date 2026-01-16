@@ -1,16 +1,23 @@
 let body = JSON.parse($response.body);
-body.me.active_bundle_subscriptions = [
+body.data.list = [
   {
-    "features": [
-
-    ],
-    "expiry": "2099-12-31T23:59:59+00:00",
-    "product_id": "com.focos.1y_t130_bundle_creator",
-    "plan_id": null
+    "autoRenewProductId": "VivaCut_Yearly_Pro_9",
+    "orderId": "470001817417189",
+    "isTrialPeriod": false,
+    "endTime": 4102444799000,
+    "productId": "VivaCut_Yearly_Pro_9",
+    "productType": 3,
+    "startTime": 1707126877000,
+    "orderStatus": 1,
+    "autoRenewStatus": true,
+    "originalOrderId": "470001817417189",
+    "sign": "de523bfabb4dc6150e8dfbaa10e67f20"
   }
 ]
-body.me.active_subscriptions_ids = [
-  "com.focos.1y_t130_bundle_creator"
+body.data.hasFreedTrialProds = [
+  "VivaCut_Yearly_Pro_9"
 ]
-body.transactions = {}
+body.data.hasPurchasedProds = [
+  "VivaCut_Yearly_Pro_9"
+]
 $done({body: JSON.stringify(body)});
