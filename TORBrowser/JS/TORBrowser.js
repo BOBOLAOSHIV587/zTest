@@ -1,29 +1,16 @@
 let body = JSON.parse($response.body);
-body.edit_pdf_ops = {
-  "remaining": -1
-}
-body.edit_pdf_max_file_size = {
-  "limit": 999999999
-}
-body.ocr_pdf_conversions = {
-  "remaining": -1
-}
-body.ocr_pdf_max_file_size = {
-  "limit": 999999999
-}
-body.organize_pdf_conversions = {
-  "remaining": -1
-}
-body.organize_pdf_max_file_size = {
-  "limit": 999999999
-}
-body.split_pdf_conversions = {
-  "remaining": -1
-}
-body.split_pdf_max_file_size = {
-  "limit": 999999999
-}
-body.split_pdf_max_split_points = {
-  "limit": 999999999
-}
+body.me.active_bundle_subscriptions = [
+  {
+    "features": [
+
+    ],
+    "expiry": "2099-12-31T23:59:59+00:00",
+    "product_id": "com.focos.1y_t130_bundle_creator",
+    "plan_id": null
+  }
+]
+body.me.active_subscriptions_ids = [
+  "com.focos.1y_t130_bundle_creator"
+]
+body.transactions = {}
 $done({body: JSON.stringify(body)});
