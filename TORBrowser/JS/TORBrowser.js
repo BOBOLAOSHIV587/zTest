@@ -1,16 +1,6 @@
 let body = JSON.parse($response.body);
-body.subscriptions = [
-    {
-      "provider": "apple",
-      "lastCheckAt": "2025-10-04T12:23:21.014171Z",
-      "environment": "production",
-      "expiresAt": "2099-12-31T23:59:59Z",
-      "application": "plx-clay",
-      "willAutoRenew": true,
-      "appleInfo": {
-        "offerType": "introductoryOffer",
-        "productId": "clay.pro.weekly.trial"
-      }
-    }
-]
+body.product_id = "";
+body.expiration_date_unix = 4102444799;
+body.expiration_date = "2099-12-31T23:59:59Z";
+body.is_valid = true
 $done({body: JSON.stringify(body)});
