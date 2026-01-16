@@ -8,8 +8,8 @@
 
 [Script]
 # > МТС Music-解锁VIP
-http-response https://api.apphud.com/v1/(subscriptions|customers) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Vfeed/JS/Vfeed.js, requires-body=true, timeout=60, tag=МТС Music
+http-response https://focoslive.oracle.bendingspoonsapps.com/v2/(users/setup|purchases/verify/apple) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Vfeed/JS/Vfeed.js, requires-body=true, timeout=60, tag=МТС Music
 
 [MITM]
-hostname = api.apphud.com
+hostname = focoslive.oracle.bendingspoonsapps.com
 
