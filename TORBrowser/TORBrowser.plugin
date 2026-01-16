@@ -8,9 +8,9 @@
 
 [Script]
 # > TOR Browser-解锁VIP
-http-response https://api.imem.app/api/premium/(getProfileStyleBatch|getOwnStatus) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+http-response https://api.vids-app.com/v1/receipt/verify script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
 
 
 [MITM]
-hostname = api.imem.app
+hostname = api.vids-app.com
 
