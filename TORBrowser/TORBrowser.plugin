@@ -5,9 +5,9 @@
 
 [Script]
 # > TOR Browser-解锁VIP
-http-response https://dc-api-v2.adobe.io/users/self/limits/conversion script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+http-response https?:\/\/[^.]+\.oracle\.bendingspoonsapps\.com\/v2\/users\/(setup|refund_consent)$ script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
 
 
 [MITM]
-hostname = dc-api-v2.adobe.io
+hostname = focos.oracle.bendingspoonsapps.com
 
