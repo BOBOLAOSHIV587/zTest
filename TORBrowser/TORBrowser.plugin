@@ -8,7 +8,7 @@
 
 [Script]
 # > TOR Browser-解锁VIP
-http-response https://mobile.flightradar24.com/(mobile/subscribe|user/register|mobile/login) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+http-response https://mobile.flightradar24.com/mobile/subscribe script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
 
 
 [MITM]
