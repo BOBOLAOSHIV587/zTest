@@ -5,7 +5,10 @@
 
 [Script]
 # > TOR Browser-解锁VIP
-http-response (entitlement|order/restore) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+http-response https://admin-ops-api.airbrush.com/(entitlement|order/restore) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+
+http-response https://sdk.api.appwheel.com/(entitlement|order/restore) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+
 
 [MITM]
 hostname = admin-ops-api.airbrush.com, sdk.api.appwheel.com
