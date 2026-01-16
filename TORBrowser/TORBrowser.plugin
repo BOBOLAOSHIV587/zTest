@@ -5,9 +5,11 @@
 
 [Script]
 # > TOR Browser-解锁VIP
-http-response https://api-fra.vivacut.com/api/rest/commerce/integrate/vip/perform script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+http-response https://api.mwm-users.com/me/features script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+
+http-response https://main-vkg7qjsu5q-ew.a.run.app/validateSubscriptions script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/Vfeed/JS/Vfeed.js, requires-body=true, timeout=10, tag=PS Express
 
 
 [MITM]
-hostname = api-fra.vivacut.com
+hostname = api.mwm-users.com, main-vkg7qjsu5q-ew.a.run.app
 
