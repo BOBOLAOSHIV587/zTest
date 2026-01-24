@@ -11,8 +11,8 @@ hostname = %APPEND% *.tiktokv.com, *.byteoversea.com, *.tik-tokapi.com
 
 [URL Rewrite]
 
-# 1. 将 _region=CN 改为 CH（保留其他参数）
-^https?://([^?#]*\?[^#]*_region=)CN(&[^#]*) https:// $ 1CH $ 2 307
+# 1. 将 _region=CN 改为 TW（保留其他参数）
+^https?://([^?#]*\?[^#]*_region=)CN(&[^#]*) https:// $ 1TW $ 2 307
 
 # 2. 将 &mcc_mnc=4xx 开头的改为 2xx（只改首数字）
 ^https?://([^?#]*\?[^#]*&mcc_mnc=)4([^#]*) https:// $ 12 $ 2 307
