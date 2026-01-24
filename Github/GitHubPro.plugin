@@ -2,11 +2,11 @@
 #!openUrl=https://apps.apple.com/app/id1477376905
 
 [Argument]
-MITM=input,hostname,tag=禁用MITM, desc=禁用MITM
+VIP = switch, ture, tag = [启用]会员, desc = 关闭开关将不对此选项生效
 
 [Script]
 # > GitHub解锁永久订阅
-http-response https://api.github.com/graphql script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/Github/JS/GithubPro.js, requires-body=true, timeout=60, tag=GithubPro
+http-response https://api.github.com/graphql script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/Github/JS/GithubPro.js, requires-body=true, timeout=60, tag=GithubPro, enable={VIP}
 
 [MITM]
-{MITM} = api.github.com
+hostname = api.github.com
