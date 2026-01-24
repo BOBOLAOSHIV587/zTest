@@ -1,0 +1,16 @@
+#!name=TikTok解锁非热门地区
+#!desc=解锁 TikTok 非热门 地区
+#!category=🐹 BOBO TikTok
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/TikTok.png
+#!arguments=国家地区代码:FR
+#!arguments-desc=国家地区代码：TikTok解锁地区，默认 FR 表示TikTok解锁法国地区。\n\n以下为地区代码：\n\nAT：奥地利\n\nAU：澳大利亚\n\nBR：巴西\n\nCA：加拿大\n\nCH：瑞士\n\nDE：德国\n\nDK：阿根廷\n\nES：西班牙\n\nFR：法国\n\nGR：希腊\n\nHU：匈牙利\n\nID：印尼\n\nIT：意大利\n\nMY：马来西亚\n\nNL：荷兰\n\nNZ：新西兰\n\nPH：菲律宾\n\nPL：波兰\n\nPT：葡萄牙\n\nSE：瑞典\n\nTH：泰国\n\nTN突尼斯\n\nTR：土耳其
+
+
+[URL Rewrite]
+(?<=_region=)CN(?=&) {{{国家地区代码}}} 307
+(?<=&mcc_mnc=)4 2 307
+^(https?:\/\/(tnc|dm)[\w-]+\.\w+\.com\/.+)(\?)(.+) $1$3 302
+(^https?:\/\/*\.\w{4}okv.com\/.+&.+)(\d{2}\.3\.\d)(.+) $118.0$3 302
+
+[MITM]
+hostname = %APPEND% *.tiktokv.com, *.byteoversea.com, *.tik-tokapi.com
