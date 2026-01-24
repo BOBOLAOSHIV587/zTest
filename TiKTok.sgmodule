@@ -7,11 +7,23 @@
 
 
 [MITM]
-hostname = *.tiktokv.com, *.byteoversea.com, *.tik-tokapi.com
+hostname = %APPEND% *.tiktokv.com, *.byteoversea.com, *.tik-tokapi.com
 
 [URL Rewrite]
-# 修改 region 为 CH（辅助）
-^https?://([^?#]+\?[^#]*_region=)CN(&[^#]*) https:// $ 1TW $ 2 307
 
-# 修改 mcc_mnc 首位 4→2（辅助）
-^https?://([^?#]+\?[^#]*&mcc_mnc=)4([^#]*) https:// $ 12 $ 2 307
+# 1. 将 _region=CN 改为 CH（保留其他参数）
+^https?://([^?#]*\?[^#]*_region=)CN(&[^#]*) https:// $ 1CH $ 2 307
+
+# 2. 将 &mcc_mnc=4xx 开头的改为 2xx（只改首数字）
+^https?://([^?#]*\?[^#]*&mcc_mnc=)4([^#]*) https:// $ 12 $ 2 307
+
+# 3. 修复 TNC/DM 域名 URL：原意可能是“保留原 URL”，但原规则会删 ? 导致错误。
+#    此处假设你本意是“对这些域名做透传”或“无操作”——但重定向必须有变化。
+#    如果你确实想触发 302（如强制刷新），可保留原结构但修复 ?：
+^https?://(tnc|dm)[\w-]+\.\w+\.com(/.+)\?(.*) https:// $ 1. $ 2. $ 3.com $ 4? $ 5 302
+# ⚠️ 但上面这条逻辑不清晰。更可能你不需要它！
+#    如果只是想“匹配但不改”，Surge 不支持无变化 302。
+#    → 建议删除第3条，除非你有明确用途。
+
+# 4. 强制 okv.com 域名中的版本号 xx.3.x 替换为 18.0
+^https?://([^.]*\.\w{4}okv\.com/.*&.*)(\d{2}\.3\.\d)(.*) https:// $ 118.0 $ 3 302
