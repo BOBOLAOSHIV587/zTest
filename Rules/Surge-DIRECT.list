@@ -4,8 +4,6 @@
 #!category=🐹 BOBO Rules
 
 
-
-
 #####HDFLIX-HDOBOX#####
 DOMAIN-SUFFIX,hfs313.serversicuro.cc
 DOMAIN-SUFFIX,dm545lq.cloudatacdn.com
@@ -27,11 +25,6 @@ DOMAIN-SUFFIX,p.10015.workers.dev
 
 
 
-
-
-
-
-
 #####nynn影视#####
 DOMAIN-SUFFIX,gs.gszyi.com
 DOMAIN-SUFFIX,vip.ffzy-video.com
@@ -42,10 +35,6 @@ DOMAIN-SUFFIX,hnts.ymuuy.com
 DOMAIN-SUFFIX,kkzycdn.com
 DOMAIN-SUFFIX,cdn.wlcdn88.com
 DOMAIN-SUFFIX,jisuts.com
-
-
-
-
 
 
 
@@ -77,8 +66,7 @@ DOMAIN-SUFFIX,cdn.yzzy27-play.com
 
 
 
-
-#####天涯资源#####
+#####MoonTV天涯资源#####
 DOMAIN-SUFFIX,tyyszywvod5.com
 DOMAIN-SUFFIX,cdn.ryplay11.com
 DOMAIN-SUFFIX,svip.ryplay17.com
@@ -98,14 +86,6 @@ DOMAIN-SUFFIX,vodcnda14.rsfcxq.com
 
 #####波点音乐#####
 IP-CIDR,10.2.217.61/32,no-resolve
-
-
-
-
-
-
-
-
 
 
 
