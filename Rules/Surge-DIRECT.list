@@ -1,6 +1,7 @@
 #!name=波波老师自用DIRECT规则
 #!desc=波波老师自用DIRECT规则
-#!category=😍BOBO Rules
+#!date=2026-01-28
+#!category=🐹 BOBO Rules
 
 
 
@@ -20,6 +21,11 @@ DOMAIN-SUFFIX,cl581wo.cloudatacdn.com
 DOMAIN-SUFFIX,queenselti.me
 DOMAIN-SUFFIX,bold.webghostpiano.workers.dev
 DOMAIN-SUFFIX,one.techparadise-92b.workers.dev
+DOMAIN-SUFFIX,proxy.valhallastream.dpdns.org
+
+
+
+
 
 
 
