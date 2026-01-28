@@ -81,8 +81,8 @@ DOMAIN-SUFFIX,vodcnd09.myqqdd.com
 DOMAIN-SUFFIX,vod.360zyx.vip
 DOMAIN-SUFFIX,vodcnd02.myqqdd.com
 DOMAIN-SUFFIX,vodcnd11.3rut0.com
-DOMAIN-SUFFIX,vodcnda14.rsfcxq.com
-
+# DOMAIN-SUFFIX,vodcnda14.rsfcxq.com
+DOMAIN-SUFFIX,rsfcxq.com
 
 
 #####波点音乐#####
