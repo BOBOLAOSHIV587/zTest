@@ -1,0 +1,10 @@
+#!name =Airbrush hack
+#!desc = Need to be enabled: every run  │  Subscription needed: ✖️
+#!icon = https://i.imgur.com/i89Qc4p.jpg
+#!date = 29.01.2026
+
+[Script]
+http-response v2/user/vip_info_by_group script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=true, timeout=10, tag=AirBrush
+
+[Mitm]
+hostname = %APPEND% api-sub.pixocial.com
