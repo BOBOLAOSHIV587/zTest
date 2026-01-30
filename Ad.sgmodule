@@ -4,7 +4,8 @@
 #!date = 29.01.2026
 
 [Script]
-http-response https://dreamfaceapp.com/df-server/user/save_user_login script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=true, timeout=10, tag=AirBrush
+http-response https://premium-api.myfitnesspal.com/v3/subscriptions/MFP/* script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=true, timeout=10, tag=AirBrush
 
+http-response https://myfitnesspal.com/v2/query-envoy/graphql script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=true, timeout=10, tag=MyFitnessPal, img-url=https://i.imgur.com/xvhlwzM.jpg
 [Mitm]
-hostname = %APPEND% dreamfaceapp.com
+hostname = %APPEND% premium-api.myfitnesspal.com, myfitnesspal.com
