@@ -4,7 +4,7 @@
 #!date = 29.01.2026
 
 [Script]
-http-response https://api-sub.pixocial.com/v2/user/vip_info_by_group script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=true, timeout=10, tag=AirBrush
+http-response https:\/\/api\.polarr\.co\/v1\/payments\/(appleiap\/receipts\/confirmation|profiles\/@me\/subscription) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js, requires-body=true, timeout=10, tag=AirBrush
 
 [Mitm]
-hostname = %APPEND% api-sub.pixocial.com
+hostname = %APPEND% api.polarr.co
