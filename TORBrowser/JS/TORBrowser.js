@@ -1,67 +1,31 @@
-if($request.url.includes("order/restore")) {
-body = body = {
-  "code": 0,
-  "message": "success",
-  "data": {
-    "inApp": [],
-    "latestReceiptInfo": [
-      {
-        "quantity": 1,
-        "productId": "airbrush.subs.mongth12.func00.lev00.standard.ver2",
-        "promotionalOfferId": "",
-        "purchaseDateMs": "1717328288000",
-        "autoRenewStatus": true,
-        "productType": "",
-        "originalTransactionId": "1470000008834448",
-        "expiresDateMs": "4102444799000",
-        "subscriptionGroupIdentifier": "21417206",
-        "transactionId": "1470000008834448",
-        "offerCodeRefName": "",
-        "awTransId": "30100000-2024-0602-1137-069894793197",
-        "isTrialPeriod": false,
-        "gracePeriodExpiresDateMs": "",
-        "isInIntroOfferPeriod": false,
-        "originalPurchaseDateMs": "1717328288000",
-        "inAppOwnershipType": "PURCHASED",
-        "status": 2
-      }
-    ]
-  },
-  "update": ""
-}
-}
-else {
-body = {
-  "message": "success",
-  "data": {
-    "entitlements": [
-      {
-        "purchaseDateMs": "1717328288000",
-        "transaction_id": "1470000008834448",
-        "grace_period_expires_date_ms": "0",
-        "start_time": "",
-        "type": 3,
-        "key": "subscription_iOS",
-        "is_trial_period": false,
-        "original_transaction_id": "1470000008834448",
-        "product_id": "airbrush.subs.mongth12.func00.lev00.standard.ver2",
-        "items": [
-          "Whiten",
-          "Brighten",
-          "Auto-retouch",
-          "Dark Circles",
-          "Acne",
-          "Smooth"
-        ],
-        "end_time": "",
-        "originalPurchaseDateMs": "1717328288000",
-        "product_type": 2,
-        "expires_date_ms": "4102444799000",
-        "product_cate": 1
-      }
-    ]
-  },
-  "code": 0
-}
-}
+const body = JSON.parse($response.body);
+if (body.data?.getSubscriptionSummary) {
+    body.data.getSubscriptionSummary.hasPremium = true;
+	body.data.getSubscriptionSummary.currentTier = "PREMIUM";
+	body.data.getSubscriptionSummary.products = [
+        {
+          "activeSubscriptionDetails": {
+            "frequencyInterval": 1,
+            "frequencyUnit": "YEAR"
+          },
+          "productId": "mfp_12m_ios_4999_1m_trial",
+          "subscriptionTier": "PREMIUM",
+          "subscriptionType": "TRIAL",
+          "requestedCancellationDate": "2025-02-13",
+          "paymentProvider": "APPLE",
+          "subscriptionEndDateTime": "2099-03-13T11:12:25.000Z",
+          "willRenew": false,
+          "subscriptionStartDateTime": "2099-02-13T12:12:25.000Z"
+        }
+      ];
+if (Array.isArray(body.data.getSubscriptionSummary.features)) {
+        body.data.getSubscriptionSummary.features.forEach(feature => {
+            if (feature.entitlement === "UPGRADABLE") {
+                feature.entitlement = "ENTITLED";
+            }
+        });
+    }
 $done({body: JSON.stringify(body)});
+} else {
+$done({});
+}
