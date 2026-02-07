@@ -35,6 +35,9 @@ DOMAIN-SUFFIX,bold.nightstudy.workers.dev
 DOMAIN-SUFFIX,api.videasy.net
 DOMAIN-SUFFIX,main-mp4.ronaldburker.workers.dev
 DOMAIN-SUFFIX,workers.dev
+DOMAIN-SUFFIX,cdn30092.slime403heq.com
+DOMAIN-SUFFIX,bcdnxw.hakunaymatata.com
+
 
 
 #####nynn影视#####
@@ -76,6 +79,10 @@ DOMAIN-SUFFIX,8.bf8bf.com
 DOMAIN-SUFFIX,vvip.high26-playback.com
 DOMAIN-SUFFIX,cdn.yzzy27-play.com
 DOMAIN-SUFFIX,s2.bfzycdn.com
+DOMAIN-SUFFIX,s4.bfzycdn.com
+DOMAIN-SUFFIX,bfzycdn.com
+
+
 
 
 #####MoonTV天涯资源#####
@@ -93,6 +100,7 @@ DOMAIN-SUFFIX,vod.360zyx.vip
 DOMAIN-SUFFIX,vodcnd02.myqqdd.com
 DOMAIN-SUFFIX,vodcnd11.3rut0.com
 DOMAIN-SUFFIX,vodcnda14.rsfcxq.com
+
 
 
 #####波点音乐#####
