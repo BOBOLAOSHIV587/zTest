@@ -108,21 +108,6 @@ async function summarizer() {
             }]
         })
     };
-
-    try {
-        if (!conf.openAIProxyUrl) throw new Error('未配置 AI 总结接口链接');
-        if (!conf.openAIAPIKey) throw new Error('未配置 AI 总结接口 API Key');
-        if (!conf.openAIModel) throw new Error('未配置 AI 总结接口模型');
-
-        const resp = await sendRequest(options, 'POST');
-        if (resp.error) throw new Error(resp.error.message);
-        const content = resp.choices[0].message.content;
-        $notify('YouTube 视频摘要', '', content);
-        return content;
-    } catch (err) {
-        $notify('YouTube 视频摘要', '摘要请求失败', err.toString());
-        return;
-    }
 }
 
 async function translator() {
