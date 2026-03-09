@@ -24,13 +24,19 @@ cache = JSON.parse(cache);
 (async () => {
 
     // 处理配置请求
-    if (url.includes('timedtextConf')) {
-        const newConf = JSON.parse($request.body);
-        if (newConf.delCache) $prefs.setValueForKey('{}', 'Sur2bCache');
-        delete newConf.delCache;
-        $prefs.setValueForKey(JSON.stringify(newConf), 'Sur2bConf');
-        return $done({ response: { body: 'OK' } });
-    }
+if (url.includes('timedtextConf')) {
+    const newConf = JSON.parse($request.body);
+    if (newConf.delCache) $prefs.setValueForKey('{}', 'Sur2bCache');
+    delete newConf.delCache;
+    $prefs.setValueForKey(JSON.stringify(newConf), 'Sur2bConf');
+    
+    // QX request-body 脚本用 $done({}) 结束，响应由 MitM 直接放行
+    return $done({
+        url: $request.url,
+        headers: $request.headers,
+        body: 'OK'
+    });
+}
 
     if (!conf) {
         $notify('Sur2b', '', '请先通过捷径配置脚本');
