@@ -1,328 +1,71 @@
 /*
-    Sur2b for Quantumult X
-    Converted from Neurogram's Sur2b (Surge version)
-    
-    YouTube video summaries, subtitle translation
+[rewrite_local]
+^https?://(user|app|entry).qtfm.cn/(m-bff|api|u2/api)/(v1|v5)/(channel_verify|personal/?carrier|user).*$ url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js
+^https?://app.qtfm.cn/m-bff/v1/audiostreams url script-request-header https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js
+^https://ad\.qtfm\.cn/api/ url reject
+^https://ip\.qtfm\.cn/ip url reject
+^https://adlaunch\.qtfm\.cn/launch url reject
+^https://woqt2\.qtfm\.cn/v2/userConfig url reject
 
-    [rewrite_local]
-    ^https:\/\/www\.youtube\.com\/api\/timedtext\? url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js
-    ^https:\/\/www\.youtube\.com\/api\/timedtextConf url script-request-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js
-
-    [mitm]
-    hostname = www.youtube.com
+[mitm]
+hostname = app.qtfm.cn, user.qtfm.cn, recpage-c.qtfm.cn, entry.qtfm.cn, ad.qtfm.cn, ip.qtfm.cn, adlaunch.qtfm.cn, woqt2.qtfm.cn
 */
 
-const url = $request.url;
-let body, subtitleData;
-let conf = $prefs.valueForKey('Sur2bConf');
-const autoGenSub = url.includes('&kind=asr');
-const videoID = url.match(/(\?|&)v=([^&]+)/)?.[2];
-const sourceLang = url.match(/&lang=([^&]+)/)?.[1];
-let cache = $prefs.valueForKey('Sur2bCache') || '{}';
-cache = JSON.parse(cache);
+if ($request.url.indexOf("/m-bff/v1/audiostreams") != -1) {
+var headers = $request.headers;
 
-(async () => {
+headers["qt-device-id"] = "6a2ccaf7b71bba75665b48d5d7f28a14";
+headers["QT-Device-Id"] = "6a2ccaf7b71bba75665b48d5d7f28a14";
 
-    // 处理配置请求
-if (url.includes('timedtextConf')) {
-    const newConf = JSON.parse($request.body);
-    if (newConf.delCache) $prefs.setValueForKey('{}', 'Sur2bCache');
-    delete newConf.delCache;
-    $prefs.setValueForKey(JSON.stringify(newConf), 'Sur2bConf');
-    
-    // QX request-body 脚本用 $done({}) 结束，响应由 MitM 直接放行
-    return $done({
-        url: $request.url,
-        headers: $request.headers,
-        body: 'OK'
-    });
+headers["qt-user-id"] = "b862d402a68046709ca71b33f9439195";
+headers["QT-User-Id"] = "b862d402a68046709ca71b33f9439195";
+
+headers["qt-access-token"] = "790876f7030c4fda9d062286ed5ba6e0";
+headers["QT-Access-Token"] = "790876f7030c4fda9d062286ed5ba6e0";
+
+headers["cookie"] = "HWWAFSESID=05fd1a6a9b1c89f212; HWWAFSESTIME=1773109433023";
+headers["Cookie"] = "HWWAFSESID=05fd1a6a9b1c89f212; HWWAFSESTIME=1773109433023";
+
+headers["user-agent"] = "QingTing-iOS/11.0.2.12 com.Qting.QTTour Mozilla/5.0 (iPhone; CPU iPhone OS 15_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148";
+headers["User-Agent"] = "QingTing-iOS/11.0.2.12 com.Qting.QTTour Mozilla/5.0 (iPhone; CPU iPhone OS 15_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148";
+
+$done({ headers: headers });
+}
+else if ($request.url.indexOf("/api/v1/personal/") != -1 || $request.url.indexOf("/api/v5/personal/") != -1) {
+var body = JSON.parse($response.body);
+
+body.data.membership.multi_hook[0].title = "2999-09-09到期";
+body.data.membership.btn_desc = "❤️作者";
+body.data.membership.multi_hook[0].subtitle = "作者11";
+body.data.membership.url = "";
+
+body.data.account.jdd.number = 999880;
+body.data.account.qtcoin.number = 999880;
+
+delete body.data.level_info;
+delete body.data.discovery.entries;
+
+$done({ body: JSON.stringify(body) });
+}
+else if ($request.url.indexOf("/channel_verify/") != -1) {
+var body = JSON.parse($response.body);
+
+body.data.user_relevance = {};
+body.data.user_relevance.autobuy = false;
+body.data.user_relevance.sale_status = "paid";
+
+$done({ body: JSON.stringify(body) });
+}
+else if ($request.url.indexOf("/user") != -1) {
+var body = JSON.parse($response.body);
+
+if (body.data && body.data.membership) {
+body.data.membership.multi_hook = body.data.membership.multi_hook || [{}];
+body.data.membership.multi_hook[0].title = "2999-09-09到期";
 }
 
-    if (!conf) {
-        $notify('Sur2b', '', '请先通过捷径配置脚本');
-        return $done({});
-    }
-
-    conf = JSON.parse(conf);
-
-    body = $response.body;
-    subtitleData = processTimedText(body);
-
-    if (!subtitleData.processedText) {
-        $notify('Sur2b', '', '未匹配到字幕内容');
-        return $done({});
-    }
-
-    let summaryContent, translatedBody;
-
-    if (conf.videoSummary && subtitleData.maxT <= conf.summaryMaxMinutes * 60 * 1000)
-        summaryContent = await summarizer();
-    if (conf.videoTranslation && subtitleData.maxT <= conf.translationMaxMinutes * 60 * 1000)
-        translatedBody = await translator();
-
-    if ((summaryContent || translatedBody) && videoID && sourceLang) {
-        if (!cache[videoID]) cache[videoID] = {};
-        if (!cache[videoID][sourceLang]) cache[videoID][sourceLang] = {};
-
-        if (summaryContent) {
-            cache[videoID][sourceLang].summary = {
-                content: summaryContent,
-                timestamp: new Date().getTime()
-            };
-        }
-
-        if (translatedBody) {
-            if (!cache[videoID][sourceLang].translation) cache[videoID][sourceLang].translation = {};
-            cache[videoID][sourceLang].translation[conf.targetLanguage] = {
-                content: translatedBody,
-                timestamp: new Date().getTime()
-            };
-        }
-    }
-
-    cleanCache();
-    $prefs.setValueForKey(JSON.stringify(cache), 'Sur2bCache');
-
-    $done({ body });
-
-})();
-
-async function summarizer() {
-
-    if (cache[videoID]?.[sourceLang]?.summary) {
-        $notify('YouTube 视频摘要', '', cache[videoID][sourceLang].summary.content);
-        return;
-    }
-
-    const options = {
-        url: conf.openAIProxyUrl,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + conf.openAIAPIKey
-        },
-        body: JSON.stringify({
-            model: conf.openAIModel,
-            messages: [{
-                role: 'user',
-                content: conf.summaryPrompts.replace(/{{subtitles}}/, subtitleData.processedText)
-            }]
-        })
-    };
+$done({ body: JSON.stringify(body) });
 }
-
-async function translator() {
-
-    if (cache[videoID]?.[sourceLang]?.translation?.[conf.targetLanguage]) {
-        body = cache[videoID][sourceLang].translation[conf.targetLanguage].content;
-        return;
-    }
-
-    let patt = new RegExp(`&lang=${conf.targetLanguage}&`, 'i');
-    if (conf.targetLanguage == 'zh-CN' || conf.targetLanguage == 'ZH-HANS') patt = /&lang=zh(-Hans)*&/i;
-    if (conf.targetLanguage == 'zh-TW' || conf.targetLanguage == 'ZH-HANT') patt = /&lang=zh-Hant&/i;
-
-    if (url.includes('&tlang=') || patt.test(url)) return;
-
-    if (/&lang=zh(-Han)*/i.test(url) && /^zh-(CN|TW|HAN)/i.test(conf.targetLanguage))
-        return await chineseTransform();
-
-    if (autoGenSub) return;
-
-    const originalSubs = [];
-    const regex = /<p t="\d+" d="\d+">([^<]+)<\/p>/g;
-    let match;
-
-    while ((match = regex.exec(body)) !== null) {
-        originalSubs.push(match[1]);
-    }
-
-    if (originalSubs.length === 0) return;
-
-    const targetSubs = [];
-    const batchSize = 50;
-
-    for (let i = 0; i < originalSubs.length; i += batchSize) {
-        const batch = originalSubs.slice(i, i + batchSize);
-        try {
-            const translatedBatch = await translateSwitcher(batch);
-            targetSubs.push(...translatedBatch);
-        } catch (error) {
-            $notify('YouTube 视频翻译', '翻译请求失败', error.toString());
-            return;
-        }
-    }
-
-    let subIndex = 0;
-    const translatedBody = body.replace(regex, (fullMatch) => {
-        if (subIndex < targetSubs.length && subIndex < originalSubs.length) {
-            const originalText = originalSubs[subIndex];
-            const translatedText = targetSubs[subIndex];
-
-            let finalSubText;
-            switch (conf.subLine) {
-                case 1: finalSubText = `${translatedText}\n${originalText}`; break;
-                case 2: finalSubText = `${originalText}\n${translatedText}`; break;
-                case 0: default: finalSubText = translatedText; break;
-            }
-
-            subIndex++;
-            const attributesMatch = fullMatch.match(/<p (t="\d+" d="\d+")>/);
-            return `<p ${attributesMatch[1]}>${finalSubText}</p>`;
-        }
-        return fullMatch;
-    });
-
-    body = translatedBody;
-    return translatedBody;
-}
-
-async function translateSwitcher(subs) {
-    switch (conf.translationProvider) {
-        case 'Google': return await googleTranslator(subs);
-        case 'DeepL': return await deepLTranslator(subs);
-        default: throw new Error(`未知的翻译服务: ${conf.translationProvider}`);
-    }
-}
-
-async function googleTranslator(subs) {
-    const options = {
-        url: `https://translate.google.com/translate_a/single?client=it&dt=qca&dt=t&dt=rmt&dt=bd&dt=rms&dt=sos&dt=md&dt=gt&dt=ld&dt=ss&dt=ex&otf=2&dj=1&hl=en&ie=UTF-8&oe=UTF-8&sl=auto&tl=${conf.targetLanguage}`,
-        headers: {
-            'User-Agent': 'GoogleTranslate/6.29.59279 (iPhone; iOS 15.4; en; iPhone14,2)'
-        },
-        body: `q=${encodeURIComponent('<p>' + subs.join('\n<p>'))}`
-    };
-
-    const resp = await sendRequest(options, 'POST');
-    if (!resp.sentences) throw new Error(`Google 翻译失败: ${JSON.stringify(resp)}`);
-
-    const combinedTrans = resp.sentences.map(s => s.trans).join('');
-    const splitSentences = combinedTrans.split('<p>');
-    return splitSentences
-        .filter(s => s && s.trim().length > 0)
-        .map(s => s.replace(/\s*[\r\n]+\s*/g, ' ').trim());
-}
-
-async function deepLTranslator(subs) {
-    if (!conf.deepLAPIKey) throw new Error('未配置 DeepL API Key');
-
-    const options = {
-        url: conf.deepLUrl || 'https://api-free.deepl.com/v2/translate',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'DeepL-Auth-Key ' + conf.deepLAPIKey,
-        },
-        body: JSON.stringify({
-            text: subs,
-            target_lang: conf.targetLanguage
-        })
-    };
-
-    const resp = await sendRequest(options, 'POST');
-    if (!resp.translations) throw new Error(`DeepL 翻译失败: ${JSON.stringify(resp)}`);
-    return resp.translations.map(t => t.text);
-}
-
-async function chineseTransform() {
-    let from = 'cn', to = 'tw';
-    if (/^zh-(CN|HANS)/i.test(conf.targetLanguage)) [from, to] = [to, from];
-
-    const openccJS = await sendRequest({
-        url: 'https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js'
-    }, 'GET');
-    eval(openccJS);
-
-    const converter = OpenCC.Converter({ from, to });
-    body = converter(body);
-}
-
-function processTimedText(xml) {
-    const regex = /<p t="(\d+)"[^>]*>(.*?)<\/p>/gs;
-    let match, maxT = 0;
-    const results = [];
-
-    while ((match = regex.exec(xml)) !== null) {
-        const t = parseInt(match[1], 10);
-        const content = match[2].trim();
-        let lineText = '';
-
-        if (content.startsWith('<s')) {
-            const sTagRegex = /<s[^>]*>([^<]+)<\/s>/g;
-            const words = Array.from(content.matchAll(sTagRegex), m => m[1]);
-            if (words.length > 0) lineText = words.join('');
-        } else {
-            lineText = content;
-        }
-
-        lineText = decodeHTMLEntities(lineText).trim();
-
-        if (lineText) {
-            if (t > maxT) maxT = t;
-            const totalSeconds = Math.floor(t / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            const paddedSeconds = String(seconds).padStart(2, '0');
-            let formattedTime;
-
-            if (hours > 0) {
-                const paddedMinutes = String(minutes).padStart(2, '0');
-                formattedTime = `(${hours}:${paddedMinutes}:${paddedSeconds})`;
-            } else {
-                formattedTime = `(${minutes}:${paddedSeconds})`;
-            }
-            results.push(`${formattedTime} ${lineText}`);
-        }
-    }
-
-    return { processedText: results.join('\n'), maxT };
-}
-
-function decodeHTMLEntities(text) {
-    const entities = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'" };
-    return text.replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, m => entities[m]);
-}
-
-// ✅ QX 核心差异：使用 $task.fetch 替代 $httpClient
-function sendRequest(options, method = 'GET') {
-    return new Promise((resolve, reject) => {
-        const task = $task.fetch({
-            url: options.url,
-            method: method,
-            headers: options.headers || {},
-            body: options.body || ''
-        });
-        task.then(
-            response => {
-                try {
-                    resolve(JSON.parse(response.body));
-                } catch {
-                    resolve(response.body);
-                }
-            },
-            reason => reject(reason.error)
-        );
-    });
-}
-
-function cleanCache() {
-    const now = Date.now();
-    const maxMs = conf.cacheMaxHours * 60 * 60 * 1000;
-
-    for (const itemKey of Object.keys(cache)) {
-        const item = cache[itemKey];
-        for (const lang of Object.keys(item)) {
-            const langObj = item[lang];
-            if (langObj.summary && now - langObj.summary.timestamp > maxMs) delete langObj.summary;
-            if (langObj.translation) {
-                for (const tLang of Object.keys(langObj.translation)) {
-                    if (now - langObj.translation[tLang].timestamp > maxMs)
-                        delete langObj.translation[tLang];
-                }
-                if (Object.keys(langObj.translation).length === 0) delete langObj.translation;
-            }
-            if (!langObj.summary && !langObj.translation) delete item[lang];
-        }
-        if (Object.keys(item).length === 0) delete cache[itemKey];
-    }
+else {
+$done({});
 }
