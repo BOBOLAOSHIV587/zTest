@@ -1,0 +1,27 @@
+# ============================================================
+# TikTok 区域解锁 - Surge 配置片段
+# 将以下各节内容添加至对应的 Surge 配置区域
+# ============================================================
+
+
+# ── [Rule] 区域 ──────────────────────────────────────────────
+# 将以下规则加入 [Rule] 节，放在 FINAL 规则之前
+# 建议配合策略组，让 TikTok 流量走指定地区节点
+
+DOMAIN-SUFFIX,tiktok.com,TikTok
+DOMAIN-SUFFIX,tiktokv.com,TikTok
+DOMAIN-SUFFIX,tiktokcdn.com,TikTok
+DOMAIN-SUFFIX,tiktokapi.com,TikTok
+DOMAIN-SUFFIX,byteoversea.com,TikTok
+DOMAIN-SUFFIX,ibytedtos.com,TikTok
+DOMAIN-SUFFIX,ipstatp.com,TikTok
+DOMAIN-SUFFIX,muscdn.com,TikTok
+DOMAIN-SUFFIX,musical.ly,TikTok
+
+
+# 方式二：远程脚本（如果你将脚本托管在远程）
+TikTok-Unlock = type=http-request, pattern=^https?://(.*\.)?tiktok\.com, requires-body=0, max-size=0, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/TikTok/TikTok.js, timeout=10
+
+
+[MITM]
+hostname = %APPEND% *.tiktok.com, *.tiktokv.com, *.tiktokapi.com
