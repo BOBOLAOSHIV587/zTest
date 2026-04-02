@@ -4,7 +4,7 @@
 
 [Script]
 # > AcFun舞蹈区地址解析
-google-auto-pager = type=http-response, pattern=^https?://(www\.google\.com(\.hk|\.co\.jp)?)/search\?.*q=,requires-body=1,max-size=0,timeout=30,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/google_scroll/JS/google_scroll.js
+google-auto-pager = type=http-response,pattern=^https?://www\.google\.(com|com\.hk|co\.jp)/search\?.*\bq=,requires-body=1,max-size=0,timeout=30,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/google_scroll/JS/google_scroll.js
 
 [MITM]
 hostname = %APPEND% www.google.com, www.google.com.hk, www.google.co.jp
