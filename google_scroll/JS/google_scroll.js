@@ -1,437 +1,255 @@
-// ==UserScript==
-// @name         Google 搜索自动翻页 (iOS Safari)
-// @namespace    https://github.com/autopager/google
-// @version      1.3.0
-// @description  Google 搜索结果自动加载下一页，支持 iOS Safari / Surge / QuantumultX / Loon
-// @author       AutoPager
-// @match        *://www.google.com/search*
-// @match        *://www.google.com.hk/search*
-// @match        *://www.google.co.jp/search*
-// @grant        none
-// @run-at       document-end
-// ==/UserScript==
-
 /**
- * ============================================================
- * Google 搜索自动翻页脚本
- * 
- * 平台支持：
- *   - iOS Safari (UserScript via Userscripts App / Scriptable)
- *   - Surge (使用 [Script] 规则注入)
- *   - QuantumultX (使用 rewrite_local 注入)
- *   - Loon (使用 [Script] 规则注入)
+ * Google 搜索自动翻页 — HTTP Response 注入版
+ * 适配：Surge / QuantumultX / Loon
  *
- * 功能特性：
- *   - 滚动到底部自动加载下一页
- *   - 优雅的加载动画指示器
- *   - 防抖节流，避免重复请求
- *   - 自动过滤重复结果
- *   - 页码徽标标记每页来源
- *   - 最大加载页数限制（默认10页）
- * ============================================================
+ * 原理：代理拦截 Google 搜索结果的 HTML 响应，
+ *       将自动翻页逻辑以 <script> 标签形式注入到 </body> 之前，
+ *       浏览器加载页面时自动执行注入的脚本。
+ *
+ * 平台变量说明：
+ *   Surge / QX / Loon → $response.body / $done({body})
+ *   三平台 API 完全一致，同一份脚本通用
  */
 
-;(function () {
+// ─── 要注入进浏览器页面的自动翻页逻辑 ────────────────────────────────────────
+const CLIENT_SCRIPT = `
+(function () {
   'use strict';
 
-  // ══════════════════════════════════════════════════════════
-  // 配置项
-  // ══════════════════════════════════════════════════════════
-  const CONFIG = {
-    maxPages: 10,             // 最多自动加载页数
-    scrollThreshold: 400,     // 距底部多少 px 时触发加载（px）
-    debounceDelay: 300,       // 滚动防抖延迟（ms）
-    retryDelay: 2000,         // 请求失败重试延迟（ms）
-    maxRetries: 3,            // 最大重试次数
-    indicatorColor: '#4285F4',// 加载指示器颜色（Google 蓝）
-    pageTagColor: '#EA4335',  // 页码标签颜色
+  var CONFIG = {
+    maxPages: 10,
+    scrollThreshold: 300,
+    debounceDelay: 250,
+    retryDelay: 2000,
+    maxRetries: 3,
   };
 
-  // ══════════════════════════════════════════════════════════
-  // 状态管理
-  // ══════════════════════════════════════════════════════════
-  const State = {
+  var State = {
     loading: false,
     currentPage: 1,
     nextPageUrl: null,
     done: false,
     retryCount: 0,
-    seenUrls: new Set(),
+    seenKeys: [],
   };
 
-  // ══════════════════════════════════════════════════════════
-  // CSS 样式注入
-  // ══════════════════════════════════════════════════════════
-  function injectStyles() {
-    const css = `
-      /* ── 加载指示器 ── */
-      #ap-loader {
-        display: none;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 24px 16px;
-        margin: 8px 0;
-        font-family: 'Google Sans', Roboto, Arial, sans-serif;
-        font-size: 14px;
-        color: #5f6368;
-      }
-      #ap-loader.active { display: flex; }
-      .ap-spinner {
-        width: 22px; height: 22px;
-        border: 3px solid #e8eaed;
-        border-top-color: ${CONFIG.indicatorColor};
-        border-radius: 50%;
-        animation: ap-spin 0.8s linear infinite;
-        flex-shrink: 0;
-      }
-      @keyframes ap-spin {
-        to { transform: rotate(360deg); }
-      }
-
-      /* ── 页码分隔线 ── */
-      .ap-page-divider {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 20px 0 12px;
-        padding: 0 4px;
-        font-family: 'Google Sans', Roboto, Arial, sans-serif;
-      }
-      .ap-page-divider::before,
-      .ap-page-divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: #e8eaed;
-      }
-      .ap-page-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: ${CONFIG.pageTagColor};
-        color: #fff;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        padding: 3px 10px;
-        border-radius: 12px;
-        white-space: nowrap;
-        flex-shrink: 0;
-      }
-
-      /* ── 全部加载完毕提示 ── */
-      #ap-done {
-        display: none;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        padding: 28px 16px;
-        font-family: 'Google Sans', Roboto, Arial, sans-serif;
-        font-size: 13px;
-        color: #9aa0a6;
-      }
-      #ap-done.active { display: flex; }
-      #ap-done svg { flex-shrink: 0; }
-
-      /* ── 结果淡入动画 ── */
-      .ap-result-enter {
-        animation: ap-fadein 0.35s ease both;
-      }
-      @keyframes ap-fadein {
-        from { opacity: 0; transform: translateY(10px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-    `;
-    const style = document.createElement('style');
-    style.id = 'ap-styles';
-    style.textContent = css;
-    document.head.appendChild(style);
+  function debounce(fn, ms) {
+    var t;
+    return function () { clearTimeout(t); t = setTimeout(fn, ms); };
   }
 
-  // ══════════════════════════════════════════════════════════
-  // UI 元素创建
-  // ══════════════════════════════════════════════════════════
-  function createLoader() {
-    const el = document.createElement('div');
-    el.id = 'ap-loader';
-    el.innerHTML = `
-      <div class="ap-spinner"></div>
-      <span>正在加载更多结果…</span>
-    `;
-    return el;
-  }
+  function seenAdd(k) { State.seenKeys.push(k); }
+  function seenHas(k) { return State.seenKeys.indexOf(k) !== -1; }
 
-  function createDoneNotice() {
-    const el = document.createElement('div');
-    el.id = 'ap-done';
-    el.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="9,12 12,15 15,9"/>
-      </svg>
-      <span>已加载全部结果</span>
-    `;
-    return el;
-  }
-
-  function createPageDivider(pageNum) {
-    const el = document.createElement('div');
-    el.className = 'ap-page-divider';
-    el.innerHTML = `<span class="ap-page-badge">第 ${pageNum} 页</span>`;
-    return el;
-  }
-
-  // ══════════════════════════════════════════════════════════
-  // 工具函数
-  // ══════════════════════════════════════════════════════════
-
-  /** 防抖 */
-  function debounce(fn, delay) {
-    let timer;
-    return function (...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn.apply(this, args), delay);
-    };
-  }
-
-  /** 获取结果容器（兼容多种 Google 布局） */
-  function getResultsContainer() {
-    return (
-      document.getElementById('search') ||
-      document.getElementById('rso') ||
-      document.querySelector('.srp-start') ||
-      document.querySelector('[data-async-context]')
-    );
-  }
-
-  /** 查找"下一页"链接 */
-  function findNextPageUrl(doc) {
-    // 标准下一页按钮
-    const nextLink =
-      doc.querySelector('#pnnext') ||
-      doc.querySelector('a[aria-label="下一页"]') ||
-      doc.querySelector('a[aria-label="Next"]') ||
-      doc.querySelector('td.b a#pnnext') ||
-      doc.querySelector('a.fl[href*="start="]');
-
-    if (nextLink && nextLink.href) {
-      return nextLink.href;
+  function getKey(el) {
+    var a = el.querySelector('a[href]');
+    if (a) {
+      try {
+        var u = new URL(a.href);
+        return u.searchParams.get('q') || u.href;
+      } catch (e) { return a.href; }
     }
+    return el.textContent.trim().slice(0, 60);
+  }
+
+  function getContainer() {
+    return document.getElementById('rso') ||
+           document.getElementById('search') ||
+           document.querySelector('[data-async-context]');
+  }
+
+  function findNext(doc) {
+    var el = doc.getElementById('pnnext') ||
+             doc.querySelector('a[aria-label="Next"]') ||
+             doc.querySelector('a[aria-label="下一页"]') ||
+             doc.querySelector('a[aria-label="次のページ"]');
+    if (el && el.href) return el.href;
+    var links = doc.querySelectorAll('#botstuff a[href*="start="]');
+    if (links.length) return links[links.length - 1].href;
     return null;
   }
 
-  /** 提取单条结果的唯一标识（防重复） */
-  function getResultKey(el) {
-    const link = el.querySelector('a[href]');
-    return link ? link.href : el.textContent.slice(0, 80);
+  function extractNodes(doc) {
+    var candidates = [];
+    var sels = ['#rso > div', '#rso .g', 'div[data-hveid][data-ved]'];
+    for (var i = 0; i < sels.length; i++) {
+      candidates = Array.prototype.slice.call(doc.querySelectorAll(sels[i]));
+      candidates = candidates.filter(function (n) { return n.textContent.trim().length > 20; });
+      if (candidates.length >= 3) break;
+    }
+    return candidates.filter(function (n) {
+      var k = getKey(n);
+      if (seenHas(k)) return false;
+      seenAdd(k); return true;
+    });
   }
 
-  // ══════════════════════════════════════════════════════════
-  // 核心：加载下一页
-  // ══════════════════════════════════════════════════════════
-  async function loadNextPage() {
+  function fixLinks(root, base) {
+    root.querySelectorAll('a[href]').forEach(function (a) {
+      try { a.href = new URL(a.getAttribute('href'), base).href; } catch (e) {}
+    });
+  }
+
+  function injectStyles() {
+    if (document.getElementById('ap-style')) return;
+    var s = document.createElement('style');
+    s.id = 'ap-style';
+    s.textContent =
+      '#ap-bar{display:flex;align-items:center;justify-content:center;gap:10px;' +
+      'padding:20px 16px;font:14px/1 "Google Sans",Roboto,Arial,sans-serif;color:#5f6368}' +
+      '#ap-bar.hidden{display:none}' +
+      '.ap-spin{width:20px;height:20px;border:3px solid #e8eaed;' +
+      'border-top-color:#4285F4;border-radius:50%;animation:ap-r .7s linear infinite}' +
+      '@keyframes ap-r{to{transform:rotate(360deg)}}' +
+      '.ap-div{display:flex;align-items:center;gap:10px;margin:16px 0 8px;' +
+      'font:600 11px/1 "Google Sans",Roboto,Arial,sans-serif}' +
+      '.ap-div::before,.ap-div::after{content:"";flex:1;height:1px;background:#e8eaed}' +
+      '.ap-badge{background:#EA4335;color:#fff;padding:3px 10px;border-radius:12px;white-space:nowrap}' +
+      '.ap-in{animation:ap-f .3s ease both}' +
+      '@keyframes ap-f{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}';
+    document.head.appendChild(s);
+  }
+
+  var barEl = null;
+  function getBar() {
+    if (!barEl) {
+      barEl = document.createElement('div');
+      barEl.id = 'ap-bar';
+      barEl.classList.add('hidden');
+      var c = getContainer();
+      if (c) c.appendChild(barEl);
+    }
+    return barEl;
+  }
+
+  function setBar(show, doneText) {
+    var b = getBar();
+    if (show) {
+      b.innerHTML = '<div class="ap-spin"></div><span>加载更多结果\u2026</span>';
+      b.classList.remove('hidden');
+    } else if (doneText) {
+      b.innerHTML = '<span style="color:#9aa0a6">\u2713 ' + doneText + '</span>';
+      b.classList.remove('hidden');
+    } else {
+      b.classList.add('hidden');
+    }
+  }
+
+  function insertDivider(container, pageNum) {
+    var d = document.createElement('div');
+    d.className = 'ap-div';
+    d.innerHTML = '<span class="ap-badge">\u7b2c ' + pageNum + ' \u9875</span>';
+    container.insertBefore(d, getBar());
+  }
+
+  function loadNext() {
     if (State.loading || State.done || !State.nextPageUrl) return;
     if (State.currentPage >= CONFIG.maxPages) {
-      markDone('已达到最大加载页数');
-      return;
+      setBar(false, '\u5df2\u8fbe\u6700\u5927\u52a0\u8f7d\u9875\u6570');
+      State.done = true; return;
     }
 
     State.loading = true;
-    showLoader(true);
+    setBar(true);
 
-    try {
-      const res = await fetch(State.nextPageUrl, {
-        credentials: 'include',
-        headers: {
-          'Accept': 'text/html,application/xhtml+xml',
-          'Accept-Language': navigator.language || 'zh-CN,zh;q=0.9',
-        },
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const html = await res.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-
-      // 更新下一页 URL
-      const nextUrl = findNextPageUrl(doc);
+    fetch(State.nextPageUrl, {
+      credentials: 'include',
+      headers: { 'Accept': 'text/html', 'Accept-Language': navigator.language || 'zh-CN' }
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function (html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var nextUrl = findNext(doc);
       State.nextPageUrl = nextUrl;
 
-      // 提取新结果
-      const newResults = extractResults(doc);
-      if (newResults.length === 0) {
-        markDone('没有更多结果了');
-        return;
-      }
+      var nodes = extractNodes(doc);
+      if (!nodes.length) { setBar(false, '\u6ca1\u6709\u66f4\u591a\u7ed3\u679c\u4e86'); State.done = true; return; }
 
-      // 追加到页面
-      appendResults(newResults, State.currentPage + 1);
-      State.currentPage += 1;
+      var container = getContainer();
+      if (!container) return;
+
+      var pageNum = State.currentPage + 1;
+      insertDivider(container, pageNum);
+
+      nodes.forEach(function (n, i) {
+        var clone = document.importNode(n, true);
+        clone.classList.add('ap-in');
+        clone.style.animationDelay = (i * 25) + 'ms';
+        fixLinks(clone, State.nextPageUrl || location.href);
+        container.insertBefore(clone, getBar());
+      });
+
+      State.currentPage = pageNum;
       State.retryCount = 0;
-
-      if (!nextUrl) {
-        markDone('已加载全部结果');
-      }
-    } catch (err) {
-      console.warn('[AutoPager] 加载失败:', err);
-      State.retryCount += 1;
-      if (State.retryCount <= CONFIG.maxRetries) {
-        console.log(`[AutoPager] ${CONFIG.retryDelay / 1000}s 后重试 (${State.retryCount}/${CONFIG.maxRetries})`);
-        setTimeout(() => {
-          State.loading = false;
-          loadNextPage();
-        }, CONFIG.retryDelay);
-        return;
-      } else {
-        markDone('加载出错，请手动翻页');
-      }
-    } finally {
-      if (!State.done) showLoader(false);
       State.loading = false;
-    }
-  }
+      setBar(false);
 
-  /** 从解析后的文档中提取搜索结果节点列表 */
-  function extractResults(doc) {
-    const selectors = [
-      '#rso > div',
-      '#search .g',
-      '.srp-start .g',
-      'div[data-hveid]',
-    ];
-
-    let nodes = [];
-    for (const sel of selectors) {
-      nodes = [...doc.querySelectorAll(sel)];
-      if (nodes.length > 0) break;
-    }
-
-    // 过滤重复
-    return nodes.filter(node => {
-      const key = getResultKey(node);
-      if (State.seenUrls.has(key)) return false;
-      State.seenUrls.add(key);
-      return true;
+      if (!nextUrl) { setBar(false, '\u5df2\u52a0\u8f7d\u5168\u90e8\u7ed3\u679c'); State.done = true; }
+    })
+    .catch(function (err) {
+      console.warn('[AP]', err);
+      State.retryCount++;
+      State.loading = false;
+      if (State.retryCount <= CONFIG.maxRetries) {
+        setTimeout(loadNext, CONFIG.retryDelay);
+      } else {
+        setBar(false, '\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u624b\u52a8\u7ffb\u9875');
+        State.done = true;
+      }
     });
   }
 
-  /** 将新结果节点追加到当前页面 */
-  function appendResults(nodes, pageNum) {
-    const container = getResultsContainer();
-    if (!container) return;
-
-    // 插入页码分隔线
-    const divider = createPageDivider(pageNum);
-    container.appendChild(divider);
-
-    // 追加每条结果（带淡入动画）
-    nodes.forEach((node, i) => {
-      const clone = document.importNode(node, true);
-      clone.classList.add('ap-result-enter');
-      clone.style.animationDelay = `${i * 30}ms`;
-      // 修复内部相对链接
-      fixRelativeLinks(clone);
-      container.appendChild(clone);
-    });
-
-    // 确保 loader 和 done 在最末尾
-    const loaderEl = document.getElementById('ap-loader');
-    const doneEl = document.getElementById('ap-done');
-    if (loaderEl) container.appendChild(loaderEl);
-    if (doneEl) container.appendChild(doneEl);
-  }
-
-  /** 修复克隆节点中的相对路径链接 */
-  function fixRelativeLinks(root) {
-    const base = new URL(State.nextPageUrl || location.href);
-    root.querySelectorAll('a[href]').forEach(a => {
-      try {
-        a.href = new URL(a.getAttribute('href'), base).href;
-      } catch (_) {}
-    });
-  }
-
-  // ══════════════════════════════════════════════════════════
-  // UI 状态控制
-  // ══════════════════════════════════════════════════════════
-  function showLoader(show) {
-    const el = document.getElementById('ap-loader');
-    if (!el) return;
-    el.classList.toggle('active', show);
-  }
-
-  function markDone(reason) {
-    State.done = true;
-    showLoader(false);
-    const el = document.getElementById('ap-done');
-    if (!el) return;
-    const span = el.querySelector('span');
-    if (span) span.textContent = reason;
-    el.classList.add('active');
-    console.log('[AutoPager] 完成:', reason);
-  }
-
-  // ══════════════════════════════════════════════════════════
-  // 滚动监听
-  // ══════════════════════════════════════════════════════════
   function onScroll() {
     if (State.loading || State.done) return;
-    const scrollBottom = document.documentElement.scrollHeight
-      - window.scrollY
-      - window.innerHeight;
-    if (scrollBottom <= CONFIG.scrollThreshold) {
-      loadNextPage();
-    }
+    var dist = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
+    if (dist <= CONFIG.scrollThreshold) loadNext();
   }
 
-  // ══════════════════════════════════════════════════════════
-  // 初始化
-  // ══════════════════════════════════════════════════════════
   function init() {
-    // 确认是搜索结果页
     if (!location.search.includes('q=')) return;
 
-    // 记录当前页已有结果，防重复
-    const existingResults = document.querySelectorAll('#rso > div, #search .g');
-    existingResults.forEach(el => State.seenUrls.add(getResultKey(el)));
+    var existing = document.querySelectorAll('#rso > div, #rso .g');
+    Array.prototype.forEach.call(existing, function (n) { seenAdd(getKey(n)); });
 
-    // 获取第一个"下一页"链接
-    State.nextPageUrl = findNextPageUrl(document);
-    if (!State.nextPageUrl) {
-      console.log('[AutoPager] 未找到下一页链接，可能已是最后一页。');
-      return;
-    }
+    State.nextPageUrl = findNext(document);
+    if (!State.nextPageUrl) { console.log('[AP] \u65e0\u4e0b\u4e00\u9875'); return; }
 
-    console.log('[AutoPager] 初始化成功，下一页:', State.nextPageUrl);
-
-    // 注入样式
+    console.log('[AP] \u521d\u59cb\u5316\u6210\u529f\uff0c\u4e0b\u4e00\u9875:', State.nextPageUrl);
     injectStyles();
+    getBar();
 
-    // 创建 UI 元素并追加到结果容器
-    const container = getResultsContainer();
-    if (container) {
-      container.appendChild(createLoader());
-      container.appendChild(createDoneNotice());
-    }
+    var bot = document.getElementById('botstuff');
+    if (bot) bot.style.display = 'none';
 
-    // 隐藏原有翻页导航条（可选，注释掉则保留）
-    const pager = document.getElementById('botstuff');
-    if (pager) pager.style.display = 'none';
-
-    // 绑定滚动事件（防抖）
     window.addEventListener('scroll', debounce(onScroll, CONFIG.debounceDelay), { passive: true });
-
-    // 初次检查（页面内容不足时直接触发）
-    setTimeout(onScroll, 800);
+    setTimeout(onScroll, 1500);
   }
 
-  // DOM 就绪后执行
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
-
 })();
+`;
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── 代理层：修改 HTML 响应，插入 <script> 标签 ──────────────────────────────
+var body = $response.body;
+
+if (typeof body === 'string' && body.length > 0) {
+  var tag = '<script id="ap-inject">' + CLIENT_SCRIPT + '<\/script>';
+
+  if (body.indexOf('</body>') !== -1) {
+    body = body.replace('</body>', tag + '</body>');
+  } else if (body.indexOf('</html>') !== -1) {
+    body = body.replace('</html>', tag + '</html>');
+  } else {
+    body = body + tag;
+  }
+}
+
+$done({ body: body });
