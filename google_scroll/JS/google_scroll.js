@@ -1,75 +1,53 @@
 /**
- * Google Search Auto-Pager for Surge
- * 适配 Safari 浏览器
+ * Google Search Auto-Pager (V3 Simulation Mode)
+ * 适配: Surge, QX, Loon
  */
 
 (function() {
-    if (window.top !== window.self) return; // 避免在 iframe 中运行
+    // 确保只在主页面运行
+    if (window.top !== window.self) return;
 
-    let isloading = false;
-    let nextPageUrl = '';
+    let isScrolling = false;
+    console.log("Google Auto-Pager: 脚本注入成功");
 
-    // 获取“下一页”的链接
-    const getNextPageUrl = () => {
-        const nextButton = document.querySelector('#pnnext, a[aria-label="Next page"], a[data-pcu]');
-        return nextButton ? nextButton.href : null;
-    };
+    // 自动点击逻辑
+    const autoClickNext = () => {
+        if (isScrolling) return;
 
-    const loadNextPage = async () => {
-        if (isloading) return;
-        nextPageUrl = getNextPageUrl();
-        if (!nextPageUrl) return;
+        // 核心：适配桌面端 (#pnnext) 和 移动端 (显示更多/Next)
+        const selectors = [
+            '#pnnext', 
+            'a[aria-label="Next page"]', 
+            'span[jsname="V67S5c"]', // 移动端“更多结果”
+            'a[data-pcu]', 
+            '.GN77S' // 部分移动端加载按钮类名
+        ];
 
-        isloading = true;
-        
-        // 创建一个加载指示器
-        const loader = document.createElement('div');
-        loader.innerHTML = '<div style="text-align:center;padding:20px;color:#70757a;">加载中...</div>';
-        document.body.appendChild(loader);
+        let nextButton = null;
+        for (let s of selectors) {
+            nextButton = document.querySelector(s);
+            if (nextButton && nextButton.offsetHeight > 0) break;
+        }
 
-        try {
-            const response = await fetch(nextPageUrl);
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            // 提取搜索结果主容器 (Google 搜索结果通常在 #search 内部)
-            const newResults = doc.querySelector('#search');
-            if (newResults) {
-                const container = document.querySelector('#search');
-                // 在当前搜索结果后追加分割线
-                const hr = document.createElement('hr');
-                hr.style.cssText = 'border:0;border-top:1px solid #dfe1e5;margin:30px 0;';
-                container.appendChild(hr);
+        if (nextButton) {
+            const rect = nextButton.getBoundingClientRect();
+            // 当按钮进入视口下方 600 像素内时触发
+            if (rect.top < window.innerHeight + 600) {
+                isScrolling = true;
+                console.log("Google Auto-Pager: 发现翻页按钮，执行点击...");
+                nextButton.click();
                 
-                // 将新内容插入
-                container.appendChild(newResults);
+                // 延迟 2 秒允许加载，防止连续触发
+                setTimeout(() => { isScrolling = false; }, 2000);
             }
-
-            // 更新当前页面的“下一页”链接，以便连续翻页
-            const currentNav = document.querySelector('#navcnt, #footrent');
-            const newNav = doc.querySelector('#navcnt, #footrent');
-            if (currentNav && newNav) {
-                currentNav.innerHTML = newNav.innerHTML;
-            }
-
-        } catch (e) {
-            console.error('自动翻页失败:', e);
-        } finally {
-            loader.remove();
-            isloading = false;
         }
     };
 
     // 监听滚动事件
-    window.addEventListener('scroll', () => {
-        const scrollHeight = document.documentElement.scrollHeight;
-        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        const clientHeight = document.documentElement.clientHeight;
-
-        // 距离底部还有 800px 时开始加载
-        if (scrollTop + clientHeight > scrollHeight - 800) {
-            loadNextPage();
-        }
-    });
+    window.addEventListener('scroll', autoClickNext);
+    // 初始执行一次，防止页面太短不触发滚动
+    setTimeout(autoClickNext, 1000);
 })();
+
+// 兼容各平台的结尾
+if (typeof $done !== 'undefined') $done({});
