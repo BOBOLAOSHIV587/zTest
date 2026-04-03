@@ -2,14 +2,11 @@
 #!desc=登陆后解锁VIP。需用+7俄罗斯号码登陆。
 #!date=2026-01-16
 #!category=🐹 BOBO Premium
-#!author= Yarmukhamedov[https://github.com/Yarmukhamedov/mitm]
-#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/TVOЁ.png
-#!openUrl=https://apps.apple.com/app/id6469774405
+
 
 [Script]
-# > TVOЁ-解锁VIP
-TVOЁ = type=http-response, pattern=https:\/\/api\.tvoe\.live\/profile$, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/TVOЁ/JS/TVOЁ.js, requires-body=true, max-size=-1, timeout=60
+掌上公交去广告 = type=http-response,pattern=^https?:\/\/api\.mybus\.com\.cn\/(guide\/getGuideList|ad\/getAdList|home\/index),requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
 
 [MITM]
-hostname = %APPEND% api.tvoe.live
+hostname = %APPEND% api.mybus.com.cn
 
