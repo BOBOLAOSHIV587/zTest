@@ -4,9 +4,65 @@
 #!category=🐹 BOBO Premium
 
 
-[Script]
-掌上公交去广告 = type=http-response,pattern=^https?:\/\/api\.mybus\.com\.cn\/(guide\/getGuideList|ad\/getAdList|home\/index),requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
+
+[URL Rewrite]
+^https?:\/\/e\.gdt\.qq\.com reject
+^https?:\/\/sdk\.open\.qq\.com reject
+^https?:\/\/gdt\.qq\.com reject
+^https?:\/\/pgdt\.gtimg\.cn reject
+
+# 穿山甲/字节广告
+^https?:\/\/.*\.pglstatp-toutiao\.com reject
+^https?:\/\/.*\.pangolin.*\.com reject
+^https?:\/\/.*\.oceanengine\.com\/api\/ad reject
+^https?:\/\/ad\.oceanengine\.com reject
+^https?:\/\/open\.snssdk\.com\/adx reject
+^https?:\/\/.*\.byteimg\.com\/ad reject
+^https?:\/\/mssdk\.bytedance\.com reject
+
+# 百度广告
+^https?:\/\/mas\.baidu\.com reject
+^https?:\/\/nsclick\.baidu\.com reject
+^https?:\/\/pos\.baidu\.com reject
+^https?:\/\/cpro\.baidu\.com reject
+
+# 优量广告（腾讯联盟）
+^https?:\/\/.*\.gdt\.qq\.com reject
+^https?:\/\/qzs\.qq\.com\/qzone\/v6\/portal\/ptlogin reject
+
+# 快手广告
+^https?:\/\/ad\.kwai\.com reject
+
+# 其他广告联盟
+^https?:\/\/adm\.sougou\.com reject
+^https?:\/\/ad\.adservice\.google\.com reject
+^https?:\/\/.*\.googlesyndication\.com reject
+^https?:\/\/.*\.doubleclick\.net reject
+
+# 友盟统计（可选，拦截后部分崩溃统计失效但不影响使用）
+^https?:\/\/alog\.umeng\.com reject
+^https?:\/\/uelogger\.umeng\.com reject
+^https?:\/\/ulogs\.umeng\.com reject
+^https?:\/\/armt\.umeng\.com reject
+
+# 个推推送广告
+^https?:\/\/sdk\.getui\.com\/ad reject
+
+# 掌上公交自有广告接口（根据抓包常见路径）
+^https?:\/\/.*\.mygolbs\.com\/.*\/ad reject
+^https?:\/\/.*\.mygolbs\.com\/.*\/banner reject
+^https?:\/\/.*\.mygolbs\.com\/.*\/splash reject
+^https?:\/\/.*\.mygolbs\.com\/.*\/popup reject
+^https?:\/\/.*\.zhcx\.com\/.*\/ad reject
+^https?:\/\/.*\.zhcx\.com\/.*\/adv reject
+^https?:\/\/.*\.zhcx\.com\/.*\/splash reject
+^https?:\/\/.*\.zhcx\.com\/.*\/banner reject
+
+# ======= 广告接口 JSON 返回置空（http-response 脚本处理） =======
+^https?:\/\/.*\.mygolbs\.com\/.*\/(ad|banner|splash|popup|advert) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
+^https?:\/\/.*\.zhcx\.com\/.*\/(ad|banner|splash|popup|advert) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
 
 [MITM]
-hostname = %APPEND% api.mybus.com.cn
+hostname = %APPEND% e.gdt.qq.com, sdk.open.qq.com, mas.baidu.com, *.pglstatp-toutiao.com, *.pangolin*.com, ad.oceanengine.com, *.mygolbs.com, *.zhcx.com, alog.umeng.com, armt.umeng.com
+
 
