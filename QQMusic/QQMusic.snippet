@@ -1,0 +1,68 @@
+# QQ音乐去广告 - QuantumultX 重写规则
+# 版本：1.1.0 | 去除开屏广告/Banner/播放页封面广告/弹窗推广
+
+[rewrite_local]
+
+# ======================================================
+# 【一】直接 reject 广告请求
+# ======================================================
+
+# --- 开屏广告 ---
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*SplashAd url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*splash_ad url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*openscreen url reject
+
+# --- 广告模块接口 ---
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*AdBanner url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*BannerAd url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*FloatAd url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*PopupAd url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*PlayerAd url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*AlbumCoverAd url reject
+
+# --- 活动/推广弹窗 ---
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*PopupActivity url reject
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg\?.*ActivityCard url reject
+^https?:\/\/c\.y\.qq\.com\/rsc\/fcgi-bin\/fcg_get_activity url reject
+^https?:\/\/c\.y\.qq\.com\/qqmusic\/fcgi-bin\/fcg_music_ad url reject
+
+# --- 老版广告接口 ---
+^https?:\/\/c\.y\.qq\.com\/fcgi-bin\/fcg_ad url reject
+^https?:\/\/c\.y\.qq\.com\/qqmusic\/fcgi-bin\/fcg_ad url reject
+
+# --- 优量汇广告SDK ---
+^https?:\/\/e\.gdt\.qq\.com url reject
+^https?:\/\/gdt\.qq\.com url reject
+^https?:\/\/pgdt\.gtimg\.cn url reject
+^https?:\/\/sdk\.open\.qq\.com url reject
+^https?:\/\/adservices\.qq\.com url reject
+
+# --- 穿山甲/字节 ---
+^https?:\/\/.*\.pglstatp-toutiao\.com url reject
+^https?:\/\/ad\.oceanengine\.com url reject
+^https?:\/\/mssdk\.bytedance\.com url reject
+
+# --- 百度广告 ---
+^https?:\/\/mas\.baidu\.com url reject
+^https?:\/\/nsclick\.baidu\.com url reject
+
+# --- 快手广告 ---
+^https?:\/\/ad\.kwai\.com url reject
+
+# --- 友盟统计 ---
+^https?:\/\/alog\.umeng\.com url reject
+^https?:\/\/armt\.umeng\.com url reject
+
+# ======================================================
+# 【二】脚本重写（聚合接口广告字段过滤）
+# ======================================================
+
+^https?:\/\/u\.y\.qq\.com\/cgi-bin\/musicu\.fcg url script-response-body https://raw.githubusercontent.com/your-repo/scripts/main/qqmusic_remove_ads.js
+^https?:\/\/c\.y\.qq\.com\/musichall\/fcgi-bin\/fcg_yqqhomepagerecommend\.fcg url script-response-body https://raw.githubusercontent.com/your-repo/scripts/main/qqmusic_remove_ads.js
+
+# ======================================================
+# 【三】MITM 域名
+# ======================================================
+
+[mitm]
+hostname = u.y.qq.com, c.y.qq.com, e.gdt.qq.com, pgdt.gtimg.cn, mas.baidu.com, alog.umeng.com, armt.umeng.com
