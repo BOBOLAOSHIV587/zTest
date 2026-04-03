@@ -3,13 +3,52 @@
 #!date=2026-01-16
 #!category=🐹 BOBO Premium
 
+
+[URL Rewrite]
+# 腾讯广告 GDT
+^https?:\/\/e\.gdt\.qq\.com reject
+^https?:\/\/sdk\.open\.qq\.com reject
+^https?:\/\/pgdt\.gtimg\.cn reject
+
+# 穿山甲/字节广告 SDK
+^https?:\/\/.*\.pglstatp-toutiao\.com reject
+^https?:\/\/.*\.pangolin.*\.com reject
+^https?:\/\/ad\.oceanengine\.com reject
+^https?:\/\/open\.snssdk\.com\/adx reject
+^https?:\/\/mssdk\.bytedance\.com reject
+
+# 百度广告
+^https?:\/\/mas\.baidu\.com reject
+^https?:\/\/nsclick\.baidu\.com reject
+^https?:\/\/pos\.baidu\.com reject
+
+# 快手广告
+^https?:\/\/ad\.kwai\.com reject
+
+# 搜狗广告
+^https?:\/\/adm\.sougou\.com reject
+
+# Google广告（备用）
+^https?:\/\/.*\.googlesyndication\.com reject
+^https?:\/\/.*\.doubleclick\.net reject
+
+# 友盟统计
+^https?:\/\/alog\.umeng\.com reject
+^https?:\/\/uelogger\.umeng\.com reject
+^https?:\/\/ulogs\.umeng\.com reject
+^https?:\/\/armt\.umeng\.com reject
+
+# 掌上公交自有广告接口
+^https?:\/\/.*\.mygolbs\.com\/.*\/(ad|banner|splash|popup|advert) reject
+^https?:\/\/.*\.zhcx\.com\/.*\/(ad|banner|splash|popup|advert) reject
+
+# ======= 脚本重写（JSON广告字段置空） =======
 [Script]
-# > TOR Browser-解锁VIP
-http-response https://admin-ops-api.airbrush.com/(entitlement|order/restore) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
+# 拦截广告接口响应，将广告数据清空
+http-response ^https?:\/\/.*\.mygolbs\.com\/.*\/(ad|banner|popup|splash) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, tag=掌上公交去广告
+http-response ^https?:\/\/.*\.zhcx\.com\/.*\/(ad|banner|popup|splash|adv) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, tag=掌上公交去广告
 
-http-response https://sdk.api.appwheel.com/(entitlement|order/restore) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, timeout=10, tag=PS Express
-
-
+# ======= MITM =======
 [MITM]
-hostname = admin-ops-api.airbrush.com, sdk.api.appwheel.com
+hostname = e.gdt.qq.com, sdk.open.qq.com, mas.baidu.com, *.pglstatp-toutiao.com, ad.oceanengine.com, *.mygolbs.com, *.zhcx.com, alog.umeng.com, armt.umeng.com
 
