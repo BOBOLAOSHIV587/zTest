@@ -58,6 +58,7 @@
 ^https?:\/\/.*\.zhcx\.com\/.*\/splash reject
 ^https?:\/\/.*\.zhcx\.com\/.*\/banner reject
 
+[Script]
 # ======= 广告接口 JSON 返回置空（http-response 脚本处理） =======
 ^https?:\/\/.*\.mygolbs\.com\/.*\/(ad|banner|splash|popup|advert) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
 ^https?:\/\/.*\.zhcx\.com\/.*\/(ad|banner|splash|popup|advert) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
