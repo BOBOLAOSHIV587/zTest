@@ -1,69 +1,82 @@
-#!name=TVOЁ
-#!desc=登陆后解锁VIP。需用+7俄罗斯号码登陆。
-#!date=2026-01-16
-#!category=🐹 BOBO Premium
-
-
+#!name = 掌上公交去广告
+#!desc = 拦截掌上公交开屏广告、Banner、弹窗广告及第三方广告SDK，纯reject无需外部脚本
+#!system = ios
+#!version = 2.0.0
+#!author = 自制
 
 [URL Rewrite]
-^https?:\/\/e\.gdt\.qq\.com reject
-^https?:\/\/sdk\.open\.qq\.com reject
-^https?:\/\/gdt\.qq\.com reject
-^https?:\/\/pgdt\.gtimg\.cn reject
 
-# 穿山甲/字节广告
-^https?:\/\/.*\.pglstatp-toutiao\.com reject
-^https?:\/\/.*\.pangolin.*\.com reject
-^https?:\/\/.*\.oceanengine\.com\/api\/ad reject
-^https?:\/\/ad\.oceanengine\.com reject
-^https?:\/\/open\.snssdk\.com\/adx reject
-^https?:\/\/.*\.byteimg\.com\/ad reject
-^https?:\/\/mssdk\.bytedance\.com reject
+# ==================== 第三方广告 SDK ====================
+
+# 穿山甲 / 字节系（最常见）
+^https?://.*\.pglstatp-toutiao\.com url reject
+^https?://.*\.pangolin-sdk-toutiao.*\.com url reject
+^https?://ad\.oceanengine\.com url reject
+^https?://open\.snssdk\.com/adx url reject
+^https?://mssdk\.bytedance\.com url reject
+^https?://log\.snssdk\.com url reject
+
+# 腾讯优量汇 GDT
+^https?://e\.gdt\.qq\.com url reject
+^https?://pgdt\.gtimg\.cn url reject
+^https?://adt\.gtimg\.com url reject
+^https?://gdt\.qq\.com url reject
 
 # 百度广告
-^https?:\/\/mas\.baidu\.com reject
-^https?:\/\/nsclick\.baidu\.com reject
-^https?:\/\/pos\.baidu\.com reject
-^https?:\/\/cpro\.baidu\.com reject
-
-# 优量广告（腾讯联盟）
-^https?:\/\/.*\.gdt\.qq\.com reject
-^https?:\/\/qzs\.qq\.com\/qzone\/v6\/portal\/ptlogin reject
+^https?://mas\.baidu\.com url reject
+^https?://nsclick\.baidu\.com url reject
+^https?://pos\.baidu\.com url reject
+^https?://cpro\.baidu\.com url reject
 
 # 快手广告
-^https?:\/\/ad\.kwai\.com reject
+^https?://ad\.kwai\.com url reject
+^https?://ad\.gifshow\.com url reject
 
-# 其他广告联盟
-^https?:\/\/adm\.sougou\.com reject
-^https?:\/\/ad\.adservice\.google\.com reject
-^https?:\/\/.*\.googlesyndication\.com reject
-^https?:\/\/.*\.doubleclick\.net reject
+# 个推/推送广告
+^https?://sdk\.getui\.com/ad url reject
 
-# 友盟统计（可选，拦截后部分崩溃统计失效但不影响使用）
-^https?:\/\/alog\.umeng\.com reject
-^https?:\/\/uelogger\.umeng\.com reject
-^https?:\/\/ulogs\.umeng\.com reject
-^https?:\/\/armt\.umeng\.com reject
+# Google 联盟（h5内嵌广告）
+^https?://.*\.googlesyndication\.com url reject
+^https?://.*\.doubleclick\.net url reject
+^https?://.*\.googleadservices\.com url reject
 
-# 个推推送广告
-^https?:\/\/sdk\.getui\.com\/ad reject
+# 搜狗广告
+^https?://adm\.sougou\.com url reject
 
-# 掌上公交自有广告接口（根据抓包常见路径）
-^https?:\/\/.*\.mygolbs\.com\/.*\/ad reject
-^https?:\/\/.*\.mygolbs\.com\/.*\/banner reject
-^https?:\/\/.*\.mygolbs\.com\/.*\/splash reject
-^https?:\/\/.*\.mygolbs\.com\/.*\/popup reject
-^https?:\/\/.*\.zhcx\.com\/.*\/ad reject
-^https?:\/\/.*\.zhcx\.com\/.*\/adv reject
-^https?:\/\/.*\.zhcx\.com\/.*\/splash reject
-^https?:\/\/.*\.zhcx\.com\/.*\/banner reject
+# 互动吧/汇量科技
+^https?://.*\.sigmob\.com url reject
+^https?://.*\.mintegral\.com url reject
 
-[Script]
-# ======= 广告接口 JSON 返回置空（http-response 脚本处理） =======
-^https?:\/\/.*\.mygolbs\.com\/.*\/(ad|banner|splash|popup|advert) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
-^https?:\/\/.*\.zhcx\.com\/.*\/(ad|banner|splash|popup|advert) url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
+# ==================== 友盟/统计 SDK ====================
+^https?://alog\.umeng\.com url reject
+^https?://uelogger\.umeng\.com url reject
+^https?://ulogs\.umeng\.com url reject
+^https?://armt\.umeng\.com url reject
 
+# ==================== 掌上公交自有广告接口 ====================
+# 开发商：厦门搜谷信息科技有限公司
+# 主域名：mygolbs.com / zhcx.com / zsgbus.com
+
+# 开屏广告
+^https?://.*\.mygolbs\.com/.*[?&]ad_type= url reject
+^https?://.*\.mygolbs\.com/.*(splash|open.?screen|launch.?ad|boot.?ad) url reject
+^https?://.*\.zhcx\.com/.*(splash|open.?screen|launch.?ad|boot.?ad) url reject
+^https?://.*\.zsgbus\.com/.*(splash|open.?screen|launch.?ad|boot.?ad) url reject
+
+# 横幅/Banner广告
+^https?://.*\.mygolbs\.com/.*(banner|adv?[_/]|[_/]adv?) url reject
+^https?://.*\.zhcx\.com/.*(banner|adv?[_/]|[_/]adv?) url reject
+
+# 弹窗/浮层广告
+^https?://.*\.mygolbs\.com/.*(popup|float|dialog) url reject
+^https?://.*\.zhcx\.com/.*(popup|float|dialog) url reject
+
+# 广告素材/资源
+^https?://.*\.mygolbs\.com/ad/ url reject
+^https?://.*\.zhcx\.com/ad/ url reject
+^https?://adres\.mygolbs\.com url reject
+^https?://adapi\.mygolbs\.com url reject
+
+# ==================== MITM ====================
 [MITM]
-hostname = %APPEND% e.gdt.qq.com, sdk.open.qq.com, mas.baidu.com, *.pglstatp-toutiao.com, *.pangolin*.com, ad.oceanengine.com, *.mygolbs.com, *.zhcx.com, alog.umeng.com, armt.umeng.com
-
-
+hostname = %APPEND% e.gdt.qq.com, pgdt.gtimg.cn, adt.gtimg.com, mas.baidu.com, alog.umeng.com, armt.umeng.com, uelogger.umeng.com, ad.oceanengine.com, open.snssdk.com, log.snssdk.com, *.pglstatp-toutiao.com, *.mygolbs.com, *.zhcx.com, *.zsgbus.com, *.sigmob.com, *.mintegral.com
