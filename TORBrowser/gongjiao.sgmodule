@@ -4,10 +4,47 @@
 #!version = 2.0.0
 #!author = 自制
 
+[Rule]
+DOMAIN-SUFFIX,hubcloud.com.cn,REJECT
+DOMAIN-SUFFIX,e.kuaishou.cn,REJECT
+DOMAIN-SUFFIX,umeng.com,REJECT
+DOMAIN-SUFFIX,sigmob.cn,REJECT
+DOMAIN-SUFFIX,zhangyuyidong.cn,REJECT
+DOMAIN-SUFFIX,mobads-logs.baidu.com,REJECT
+DOMAIN-SUFFIX,adstatistic.mygolbs.com,REJECT
+DOMAIN-SUFFIX,adintl.cn,REJECT
+DOMAIN-SUFFIX,adbkwai.com,REJECT
+DOMAIN-SUFFIX,adx.adwangmai.com,REJECT
+DOMAIN-SUFFIX,fancyapi.com,REJECT
+DOMAIN-SUFFIX,luimg.baidu.com,REJECT
+DOMAIN-SUFFIX,66mobi.com,REJECT
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+DOMAIN-SUFFIX,e.kuaishou.com,REJECT
+DOMAIN-SUFFIX,bcebos.com,REJECT
+DOMAIN-SUFFIX,meituan.net,REJECT
+DOMAIN-SUFFIX,p0.meituan.net,REJECT
+DOMAIN-SUFFIX,open.e.kuaishou.com,REJECT
+DOMAIN-SUFFIX,apimobile.meituan.com,REJECT
+DOMAIN-SUFFIX,sdklog.zhangyuyidong.cn,REJECT
+DOMAIN-SUFFIX,mobads.baidu.com,REJECT
+DOMAIN-SUFFIX,sdk.1rtb.net,REJECT
+DOMAIN-SUFFIX,api.shanghailingye.cn,REJECT
+DOMAIN-SUFFIX,api-access.pangolin-sdk-toutiao.com,REJECT
+DOMAIN-SUFFIX,openadapi.fancydsp.com,REJECT
+DOMAIN-SUFFIX,win.gdt.qq.com,REJECT
+DOMAIN-SUFFIX,p2-lm.adukwai.com,REJECT
+DOMAIN-SUFFIX,p4-lm.adkwai.com,REJECT
+DOMAIN-SUFFIX,p2-lm.adkwai.com,REJECT
+DOMAIN-SUFFIX,adsmind.ugdtimg.com,REJECT
+DOMAIN-SUFFIX,resource.ad-scope.com.cn,REJECT
+DOMAIN-SUFFIX,pos.baidu.com,REJECT
+DOMAIN-SUFFIX,pgdt.ugdtimg.com,REJECT
+DOMAIN-SUFFIX,pic.fancyapi.com,REJECT
+DOMAIN-SUFFIX,p66-ad.adkwai.com,REJECT
+DOMAIN-SUFFIX,sdk.1rtb.net,REJECT
+
+
 [URL Rewrite]
-
-# ==================== 第三方广告 SDK ====================
-
 # 穿山甲 / 字节系（最常见）
 ^https?://.*\.pglstatp-toutiao\.com url reject
 ^https?://.*\.pangolin-sdk-toutiao.*\.com url reject
@@ -77,6 +114,5 @@
 ^https?://adres\.mygolbs\.com url reject
 ^https?://adapi\.mygolbs\.com url reject
 
-# ==================== MITM ====================
 [MITM]
 hostname = %APPEND% e.gdt.qq.com, pgdt.gtimg.cn, adt.gtimg.com, mas.baidu.com, alog.umeng.com, armt.umeng.com, uelogger.umeng.com, ad.oceanengine.com, open.snssdk.com, log.snssdk.com, *.pglstatp-toutiao.com, *.mygolbs.com, *.zhcx.com, *.zsgbus.com, *.sigmob.com, *.mintegral.com
