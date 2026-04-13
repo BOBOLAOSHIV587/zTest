@@ -1,69 +1,130 @@
 /**
- * YouTube 强制简体中文字幕
- * 响应体脚本 - Loon 专用版
+ * YouTube 字幕抓取 + Gemini 总结
+ * 响应体脚本 - 通用版 (Surge / QX / Loon)
+ * 
+ * 配置说明：将下方 GEMINI_API_KEY 替换为你的 API Key
  */
 
-const TAG = '[YT-ZH-Sub]';
+const GEMINI_API_KEY = 'AIzaSyCaAfJpcubTzA7OZDnD07clUJOhO9CtnSY';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_API_KEY;
+const CACHE_KEY = 'yt_summary_cache';
+const TAG = '[YT-Summary]';
 
 (function () {
     var url = $request.url;
+    var body = $response.body;
 
-    // 已是中文字幕，跳过
-    if (/[?&]tlang=zh/.test(url) || /[?&]lang=zh/.test(url)) {
-        console.log(TAG + ' already zh, skip');
+    if (!body || body.length < 100) {
         $done({});
         return;
     }
 
-    // 从原始 URL 提取 v 参数（视频 ID）
+    // 提取视频 ID
     var vMatch = url.match(/[?&]v=([^&]+)/);
     if (!vMatch) {
-        console.log(TAG + ' no video id found, skip');
         $done({});
         return;
     }
     var videoId = vMatch[1];
 
-    // 提取其他必要参数
-    var params = ['ei', 'caps', 'opi', 'xoaf', 'xowf', 'xospf',
-                  'ip', 'ipbits', 'expire', 'sparams', 'signature',
-                  'key', 'kind', 'format'];
-    var query = 'v=' + videoId;
-    params.forEach(function (p) {
-        var m = url.match(new RegExp('[?&]' + p + '=([^&]*)'));
-        if (m) query += '&' + p + '=' + m[1];
+    // 跳过非自动字幕/已是中文的请求（只处理原始字幕）
+    if (/[?&]tlang=zh/.test(url) || /[?&]_ytzhsub=1/.test(url)) {
+        $done({});
+        return;
+    }
+
+    console.log(TAG + ' got subtitle for v=' + videoId + ' len=' + body.length);
+
+    // 解析字幕文本（srv3 / xml 格式）
+    var text = parseSubtitle(body);
+    if (!text || text.length < 50) {
+        console.log(TAG + ' subtitle text too short, skip');
+        $done({});
+        return;
+    }
+
+    console.log(TAG + ' parsed text length=' + text.length);
+
+    // 调用 Gemini 生成总结
+    var prompt = '以下是一个YouTube视频的字幕文本，请用简体中文生成一个结构清晰的总结。\n\n要求：\n1. 先用1-2句话概括视频主题\n2. 列出3-5个核心要点（用•符号）\n3. 最后一句话说明适合哪类观众\n\n字幕内容：\n' + text.substring(0, 8000);
+
+    var requestBody = JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
     });
 
-    // 强制指定简体中文，去掉原来的 lang/tlang/hl
-    query += '&hl=zh-Hans&lang=zh-Hans&tlang=zh-Hans&fmt=srv3';
+    var isQX = typeof $task !== 'undefined';
 
-    var zhUrl = 'https://www.youtube.com/api/timedtext?' + query;
+    function onGeminiSuccess(respBody) {
+        try {
+            var json = JSON.parse(respBody);
+            var summary = json.candidates[0].content.parts[0].text;
+            console.log(TAG + ' summary generated, len=' + summary.length);
 
-    // 构造干净的请求头，不带认证信息
-    var headers = {
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-        'Accept': '*/*',
-        'Accept-Language': 'zh-Hans-CN,zh-Hans;q=0.9',
-        'Origin': 'https://www.youtube.com',
-        'Referer': 'https://www.youtube.com/'
-    };
+            // 存入持久化存储，供注入脚本读取
+            var cacheData = JSON.stringify({
+                videoId: videoId,
+                summary: summary,
+                timestamp: Date.now()
+            });
 
-    console.log(TAG + ' fetching clean url for v=' + videoId);
+            if (typeof $persistentStore !== 'undefined') {
+                $persistentStore.write(cacheData, CACHE_KEY);
+            } else if (typeof $prefs !== 'undefined') {
+                $prefs.setValueForKey(cacheData, CACHE_KEY);
+            }
 
-    $httpClient.get({ url: zhUrl, headers: headers }, function (err, resp, body) {
-        if (err) {
-            console.log(TAG + ' error: ' + JSON.stringify(err));
-            $done({});
-            return;
+            console.log(TAG + ' summary saved to store');
+        } catch (e) {
+            console.log(TAG + ' parse error: ' + e);
         }
-        var status = resp.status;
-        console.log(TAG + ' status=' + status + ' bodyLen=' + (body ? body.length : 0));
-        if (status === 200 && body && body.length > 100) {
-            console.log(TAG + ' replaced with zh subtitle');
-            $done({ body: body });
-        } else {
-            console.log(TAG + ' failed status=' + status + ', keep original');
-            $done({});
+        $done({});
+    }
+
+    function onError(err) {
+        console.log(TAG + ' error: ' + JSON.stringify(err));
+        $done({});
+    }
+
+    if (isQX) {
+        $task.fetch({
+            url: GEMINI_URL,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: requestBody
+        }).then(function (resp) {
+            onGeminiSuccess(resp.body);
+        }, onError);
+    } else {
+        $httpClient.post({
+            url: GEMINI_URL,
+            headers: { 'Content-Type': 'application/json' },
+            body: requestBody
+        }, function (err, resp, body) {
+            if (err) { onError(err); return; }
+            onGeminiSuccess(body);
+        });
+    }
+
+    // 解析 srv3/xml 字幕格式
+    function parseSubtitle(raw) {
+        try {
+            // 去掉 XML 标签，提取纯文本
+            var text = raw
+                .replace(/<\?xml[^>]*\?>/g, '')
+                .replace(/<text[^>]*>/g, ' ')
+                .replace(/<\/text>/g, ' ')
+                .replace(/<[^>]+>/g, '')
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/\s+/g, ' ')
+                .trim();
+            return text;
+        } catch (e) {
+            return '';
         }
-    });
+    }
 })();
