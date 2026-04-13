@@ -5,8 +5,8 @@
 
 
 [Script]
-http-request ^https://www\.youtube\.com/api/timedtext\?(?!.*_ytzhsub=1) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/YT-Sub-Clean.js, requires-body=false, tag=YT-ZH-Sub-Clean
-http-response ^https://www\.youtube\.com/api/timedtext\?(?!.*_ytzhsub=1) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, max-size=-1, tag=YT-ZH-Sub
+http-request ^https://www\.youtube\.com/api/timedtext\?(?!.*_ytzhsub=1) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/YT-Sub-Clean.js, require-body=false, tag=YT-ZH-Sub-Clean
+http-response ^https://www\.youtube\.com/api/timedtext\?(?!.*_ytzhsub=1) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, require-body=true, max-size=-1, tag=YT-ZH-Sub
 
 [MITM]
 hostname = www.youtube.com
