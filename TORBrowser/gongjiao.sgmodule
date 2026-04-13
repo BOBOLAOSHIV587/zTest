@@ -4,13 +4,10 @@
 #!version = 2.0.0
 #!author = 自制
 
+[rewrite_local]
+# > YouTube 强制简体中文字幕
+^https://www\.youtube\.com/api/timedtext\?.*_ytzhsub=1 url script-request-header https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/YT-Sub-Clean.js
+^https://www\.youtube\.com/api/timedtext\? url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
 
-[Script]
-# 拦截字幕，调用 Gemini 生成总结（存入持久化存储）
-http-response ^https://www\.youtube\.com/api/timedtext\? script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, tag=YT-Summary-Sub
-
-# 拦截 YouTube 页面，注入总结悬浮窗
-http-response ^https://m\.youtube\.com/watch script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, max-size=0, tag=YT-Summary-Inject
-
-[MITM]
-hostname = %APPEND% www.youtube.com, m.youtube.com
+[mitm]
+hostname = www.youtube.com
