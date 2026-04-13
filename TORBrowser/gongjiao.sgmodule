@@ -4,12 +4,13 @@
 #!version = 2.0.0
 #!author = 自制
 
-[Script]
-# 请求头：清理参数，去除 Cookie
-http-request ^https://www\.youtube\.com/api/timedtext\? script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/YT-Sub-Clean.js, requires-body=false, tag=YT-ZH-Sub-Clean
 
-# 响应体：替换为简中字幕
-http-response ^https://www\.youtube\.com/api/timedtext\?(?!.*_ytzhsub=1) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, tag=YT-ZH-Sub
+[Script]
+# 拦截字幕，调用 Gemini 生成总结（存入持久化存储）
+http-response ^https://www\.youtube\.com/api/timedtext\? script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, tag=YT-Summary-Sub
+
+# 拦截 YouTube 页面，注入总结悬浮窗
+http-response ^https://m\.youtube\.com/watch script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, max-size=0, tag=YT-Summary-Inject
 
 [MITM]
-hostname = %APPEND% www.youtube.com
+hostname = %APPEND% www.youtube.com, m.youtube.com
