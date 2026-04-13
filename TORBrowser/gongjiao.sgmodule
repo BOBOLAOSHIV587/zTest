@@ -4,115 +4,12 @@
 #!version = 2.0.0
 #!author = 自制
 
-[Rule]
-DOMAIN-SUFFIX,hubcloud.com.cn,REJECT
-DOMAIN-SUFFIX,e.kuaishou.cn,REJECT
-DOMAIN-SUFFIX,umeng.com,REJECT
-DOMAIN-SUFFIX,sigmob.cn,REJECT
-DOMAIN-SUFFIX,zhangyuyidong.cn,REJECT
-DOMAIN-SUFFIX,mobads-logs.baidu.com,REJECT
-DOMAIN-SUFFIX,adstatistic.mygolbs.com,REJECT
-DOMAIN-SUFFIX,adintl.cn,REJECT
-DOMAIN-SUFFIX,adbkwai.com,REJECT
-DOMAIN-SUFFIX,adx.adwangmai.com,REJECT
-DOMAIN-SUFFIX,fancyapi.com,REJECT
-DOMAIN-SUFFIX,luimg.baidu.com,REJECT
-DOMAIN-SUFFIX,66mobi.com,REJECT
-DOMAIN-SUFFIX,gdt.qq.com,REJECT
-DOMAIN-SUFFIX,e.kuaishou.com,REJECT
-DOMAIN-SUFFIX,bcebos.com,REJECT
-DOMAIN-SUFFIX,meituan.net,REJECT
-DOMAIN-SUFFIX,p0.meituan.net,REJECT
-DOMAIN-SUFFIX,open.e.kuaishou.com,REJECT
-DOMAIN-SUFFIX,apimobile.meituan.com,REJECT
-DOMAIN-SUFFIX,sdklog.zhangyuyidong.cn,REJECT
-DOMAIN-SUFFIX,mobads.baidu.com,REJECT
-DOMAIN-SUFFIX,sdk.1rtb.net,REJECT
-DOMAIN-SUFFIX,api.shanghailingye.cn,REJECT
-DOMAIN-SUFFIX,api-access.pangolin-sdk-toutiao.com,REJECT
-DOMAIN-SUFFIX,openadapi.fancydsp.com,REJECT
-DOMAIN-SUFFIX,win.gdt.qq.com,REJECT
-DOMAIN-SUFFIX,p2-lm.adukwai.com,REJECT
-DOMAIN-SUFFIX,p4-lm.adkwai.com,REJECT
-DOMAIN-SUFFIX,p2-lm.adkwai.com,REJECT
-DOMAIN-SUFFIX,adsmind.ugdtimg.com,REJECT
-DOMAIN-SUFFIX,resource.ad-scope.com.cn,REJECT
-DOMAIN-SUFFIX,pos.baidu.com,REJECT
-DOMAIN-SUFFIX,pgdt.ugdtimg.com,REJECT
-DOMAIN-SUFFIX,pic.fancyapi.com,REJECT
-DOMAIN-SUFFIX,p66-ad.adkwai.com,REJECT
-DOMAIN-SUFFIX,sdk.1rtb.net,REJECT
+[Script]
+# 请求头：清理参数，去除 Cookie
+http-request ^https://www\.youtube\.com/api/timedtext\? script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/YT-Sub-Clean.js, requires-body=false, tag=YT-ZH-Sub-Clean
 
-
-[URL Rewrite]
-# 穿山甲 / 字节系（最常见）
-^https?://.*\.pglstatp-toutiao\.com url reject
-^https?://.*\.pangolin-sdk-toutiao.*\.com url reject
-^https?://ad\.oceanengine\.com url reject
-^https?://open\.snssdk\.com/adx url reject
-^https?://mssdk\.bytedance\.com url reject
-^https?://log\.snssdk\.com url reject
-
-# 腾讯优量汇 GDT
-^https?://e\.gdt\.qq\.com url reject
-^https?://pgdt\.gtimg\.cn url reject
-^https?://adt\.gtimg\.com url reject
-^https?://gdt\.qq\.com url reject
-
-# 百度广告
-^https?://mas\.baidu\.com url reject
-^https?://nsclick\.baidu\.com url reject
-^https?://pos\.baidu\.com url reject
-^https?://cpro\.baidu\.com url reject
-
-# 快手广告
-^https?://ad\.kwai\.com url reject
-^https?://ad\.gifshow\.com url reject
-
-# 个推/推送广告
-^https?://sdk\.getui\.com/ad url reject
-
-# Google 联盟（h5内嵌广告）
-^https?://.*\.googlesyndication\.com url reject
-^https?://.*\.doubleclick\.net url reject
-^https?://.*\.googleadservices\.com url reject
-
-# 搜狗广告
-^https?://adm\.sougou\.com url reject
-
-# 互动吧/汇量科技
-^https?://.*\.sigmob\.com url reject
-^https?://.*\.mintegral\.com url reject
-
-# ==================== 友盟/统计 SDK ====================
-^https?://alog\.umeng\.com url reject
-^https?://uelogger\.umeng\.com url reject
-^https?://ulogs\.umeng\.com url reject
-^https?://armt\.umeng\.com url reject
-
-# ==================== 掌上公交自有广告接口 ====================
-# 开发商：厦门搜谷信息科技有限公司
-# 主域名：mygolbs.com / zhcx.com / zsgbus.com
-
-# 开屏广告
-^https?://.*\.mygolbs\.com/.*[?&]ad_type= url reject
-^https?://.*\.mygolbs\.com/.*(splash|open.?screen|launch.?ad|boot.?ad) url reject
-^https?://.*\.zhcx\.com/.*(splash|open.?screen|launch.?ad|boot.?ad) url reject
-^https?://.*\.zsgbus\.com/.*(splash|open.?screen|launch.?ad|boot.?ad) url reject
-
-# 横幅/Banner广告
-^https?://.*\.mygolbs\.com/.*(banner|adv?[_/]|[_/]adv?) url reject
-^https?://.*\.zhcx\.com/.*(banner|adv?[_/]|[_/]adv?) url reject
-
-# 弹窗/浮层广告
-^https?://.*\.mygolbs\.com/.*(popup|float|dialog) url reject
-^https?://.*\.zhcx\.com/.*(popup|float|dialog) url reject
-
-# 广告素材/资源
-^https?://.*\.mygolbs\.com/ad/ url reject
-^https?://.*\.zhcx\.com/ad/ url reject
-^https?://adres\.mygolbs\.com url reject
-^https?://adapi\.mygolbs\.com url reject
+# 响应体：替换为简中字幕
+http-response ^https://www\.youtube\.com/api/timedtext\?(?!.*_ytzhsub=1) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js, requires-body=true, tag=YT-ZH-Sub
 
 [MITM]
-hostname = %APPEND% e.gdt.qq.com, pgdt.gtimg.cn, adt.gtimg.com, mas.baidu.com, alog.umeng.com, armt.umeng.com, uelogger.umeng.com, ad.oceanengine.com, open.snssdk.com, log.snssdk.com, *.pglstatp-toutiao.com, *.mygolbs.com, *.zhcx.com, *.zsgbus.com, *.sigmob.com, *.mintegral.com
+hostname = %APPEND% www.youtube.com
