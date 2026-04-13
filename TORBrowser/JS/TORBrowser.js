@@ -49,7 +49,7 @@ const TAG = '[YT-ZH-Sub]';
         );
     } else {
         // policy: 'DIRECT' 让 Loon 直连发出，不再触发脚本拦截
-        $httpClient.get({ url: zhUrl, headers: headers, policy: 'DIRECT' }, function (err, resp, body) {
+        $httpClient.get({ url: zhUrl, headers: headers, policy: 'YouTube' }, function (err, resp, body) {
             if (err) { onError(err); return; }
             onSuccess(body, resp.status);
         });
