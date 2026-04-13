@@ -61,9 +61,12 @@ const TAG = '[YT-ZH-Sub]';
         );
     } else {
         // Surge / Loon / Stash
-        $httpClient.get({ url: zhUrl, headers: headers }, function (err, resp, body) {
-            if (err) { onError(err); return; }
-            onSuccess(body, resp.status);
-        });
-    }
-})();
+$httpClient.get({
+    url: zhUrl,
+    headers: Object.assign(headers, {
+        'X-Loon-Skip': '1'   // 仅占位，真正跳过靠下面的规则过滤
+    })
+}, function (err, resp, body) {
+    if (err) { onError(err); return; }
+    onSuccess(body, resp.status);
+});
