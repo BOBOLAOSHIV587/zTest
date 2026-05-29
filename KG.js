@@ -10,62 +10,96 @@
 [mitm]
 hostname = app.qtfm.cn, user.qtfm.cn, recpage-c.qtfm.cn, entry.qtfm.cn, ad.qtfm.cn, ip.qtfm.cn, adlaunch.qtfm.cn, woqt2.qtfm.cn
 */
+/*
+[Script]
+# QX 配置 (在[task]或[gallery]中手动触发，或点击构造器运行)
+# 也可以作为 Rewrite 触发，但最推荐手动触发
 
-if ($request.url.indexOf("/m-bff/v1/audiostreams") != -1) {
-var headers = $request.headers;
+# Surge / Loon 面板(Panel)或组件配置（点击即执行拉取）
+# Surge: type=generic
+# Loon: type=generic
+*/
 
-headers["qt-device-id"] = "6a2ccaf7b71bba75665b48d5d7f28a14";
-headers["QT-Device-Id"] = "6a2ccaf7b71bba75665b48d5d7f28a14";
+// ================= 1. 配置区域 =================
+const CONFIG = {
+  url: "https://raw.githubusercontent.com/username/repo/main/data.json", // 你的 GitHub Raw 地址
+  storageKey: "github_raw_data_key", 
+  timeout: 5000 
+};
 
-headers["qt-user-id"] = "b862d402a68046709ca71b33f9439195";
-headers["QT-User-Id"] = "b862d402a68046709ca71b33f9439195";
+// ================= 2. 主逻辑区域 =================
+async function main() {
+  const $ = apiAdapter();
+  $.log(`\n🔔 收到手动触发指令，开始拉取 GitHub Raw...`);
 
-headers["qt-access-token"] = "790876f7030c4fda9d062286ed5ba6e0";
-headers["QT-Access-Token"] = "790876f7030c4fda9d062286ed5ba6e0";
+  const options = {
+    url: CONFIG.url,
+    headers: {
+      "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+    },
+    timeout: CONFIG.timeout
+  };
 
-headers["cookie"] = "HWWAFSESID=05fd1a6a9b1c89f212; HWWAFSESTIME=1773109433023";
-headers["Cookie"] = "HWWAFSESID=05fd1a6a9b1c89f212; HWWAFSESTIME=1773109433023";
+  $.get(options, (error, response, data) => {
+    if (error) {
+      $.log(`❌ 拉取失败: ${error}`);
+      $.notify("GitHub 拉取失败", "网络请求错误", error);
+      $.done({ title: "拉取失败", content: "网络错误", icon: "exclamationmark.triangle" });
+      return;
+    }
 
-headers["user-agent"] = "QingTing-iOS/11.0.2.12 com.Qting.QTTour Mozilla/5.0 (iPhone; CPU iPhone OS 15_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148";
-headers["User-Agent"] = "QingTing-iOS/11.0.2.12 com.Qting.QTTour Mozilla/5.0 (iPhone; CPU iPhone OS 15_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148";
-
-$done({ headers: headers });
+    if (response.statusCode === 200) {
+      $.log(`🟩 拉取成功！大小: ${data.length} 字节`);
+      const saveSuccess = $.setdata(data, CONFIG.storageKey);
+      
+      if (saveSuccess) {
+        $.log(`💾 数据已成功写入本地 [${CONFIG.storageKey}]`);
+        $.notify("GitHub 拉取成功", "本地数据已刷新", `大小: ${data.length} 字节`);
+        // 返回给 Surge/Loon 面板显示的信息
+        $.done({ title: "GitHub 数据更新", content: 成功拉取 ${data.length} 字节, icon: "doc.plaintext" });
+      } else {
+        $.log(`⚠️ 本地写入失败`);
+        $.done({ title: "写入失败", content: "无法保存到本地存储" });
+      }
+    } else {
+      $.log(`❌ 状态码异常: ${response.statusCode}`);
+      $.notify("GitHub 拉取失败", "状态码异常", `Status: ${response.statusCode}`);
+      $.done({ title: "拉取失败", content: 状态码: ${response.statusCode} });
+    }
+  });
 }
-else if ($request.url.indexOf("/api/v1/personal/") != -1 || $request.url.indexOf("/api/v5/personal/") != -1) {
-var body = JSON.parse($response.body);
 
-body.data.membership.multi_hook[0].title = "2999-09-09到期";
-body.data.membership.btn_desc = "❤️作者";
-body.data.membership.multi_hook[0].subtitle = "作者11";
-body.data.membership.url = "";
+main();
 
-body.data.account.jdd.number = 999880;
-body.data.account.qtcoin.number = 999880;
+// ================= 3. 核心适配层 =================
+function apiAdapter() {
+  const isQX = typeof $task !== "undefined";
+  const isSurge = typeof $httpClient !== "undefined" && typeof $utils !== "undefined";
+  const isLoon = typeof $loon !== "undefined";
 
-delete body.data.level_info;
-delete body.data.discovery.entries;
-
-$done({ body: JSON.stringify(body) });
-}
-else if ($request.url.indexOf("/channel_verify/") != -1) {
-var body = JSON.parse($response.body);
-
-body.data.user_relevance = {};
-body.data.user_relevance.autobuy = false;
-body.data.user_relevance.sale_status = "paid";
-
-$done({ body: JSON.stringify(body) });
-}
-else if ($request.url.indexOf("/user") != -1) {
-var body = JSON.parse($response.body);
-
-if (body.data && body.data.membership) {
-body.data.membership.multi_hook = body.data.membership.multi_hook || [{}];
-body.data.membership.multi_hook[0].title = "2999-09-09到期";
-}
-
-$done({ body: JSON.stringify(body) });
-}
-else {
-$done({});
+  return {
+    log: (msg) => console.log(msg),
+    notify: (t, s, m) => {
+      if (isQX) $notify(t, s, m);
+      else $notification.post(t, s, m);
+    },
+    setdata: (v, k) => {
+      if (isQX) return $prefs.setValueForKey(v, k);
+      else return $persistentStore.write(v, k);
+    },
+    get: (opts, cb) => {
+      if (isQX) {
+        opts.method = "GET";
+        $task.fetch(opts).then(
+          (r) => cb(null, { statusCode: r.statusCode }, r.body),
+          (e) => cb(e.error, null, null)
+        );
+      } else {
+        $httpClient.get(opts, (e, r, b) => cb(e, r, b));
+      }
+    },
+    done: (val = {}) => {
+      if (typeof $done !== "undefined") $done(val);
+    }
+  };
 }
