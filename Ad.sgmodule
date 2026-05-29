@@ -1,5 +1,10 @@
-[Panel]
-GitHub拉取 = script-name=GitHubFetch, update-interval=86400
+#!name=GitHub to Raw Redirect
+#!desc=自动将 GitHub 网页版文件链接重定向为 Raw 原始文件链接。
+#!system=ios
 
-[Script]
-GitHubFetch = type=generic, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/KG.js
+https://ahrefs.com/writing-tools/paragraph-rewriter
+# 如果单纯使用 Surge，也可以直接用内置的正则重写（无需执行 JS 脚本，效率更高）
+^https?:\/\/github\.com\/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)$ https://raw.githubusercontent.com/$1/$2/$3/$4 302
+
+[MITM]
+hostname = %APPEND% github.com
