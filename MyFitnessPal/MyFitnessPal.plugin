@@ -7,9 +7,9 @@
 #!tag = k4be1, M[i]TM[OS]
 
 [Script]
-http-response https://premium-api.myfitnesspal.com/v3/subscriptions/MFP/* script-path= https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/MyFitnessPal/MyFitnessPal.js, requires-body=true, timeout=10, tag=MyFitnessPal, img-url=https://i.imgur.com/xvhlwzM.jpg
+http-response ^https?:\/\/api\.myfitnesspal\.com\/api\/v\d\/(premium\/test_features|users\/\d+\/subscription) script-path= https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/MyFitnessPal/MyFitnessPal.js, requires-body=true, timeout=10, tag=MyFitnessPal, img-url=https://i.imgur.com/xvhlwzM.jpg
 
 http-response https://myfitnesspal.com/v2/query-envoy/graphql script-path= https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/MyFitnessPal/MyFitnessPal2.js, requires-body=true, timeout=10, tag=MyFitnessPal, img-url=https://i.imgur.com/xvhlwzM.jpg
 
 [MITM]
-hostname = %APPEND% premium-api.myfitnesspal.com, myfitnesspal.com
+hostname = %APPEND% api.myfitnesspal.com, identity-api.myfitnesspal.com, myfitnesspal.com
