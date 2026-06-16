@@ -1,0 +1,14 @@
+#!name=MyFitnessPal解锁Premium
+#!desc=MyFitnessPal解锁Premium。
+#!date=2026-01-21
+#!category=🐹 BOBO Premium
+#!author=Mike-offers[https://github.com/Mike-offers/Rewrite]
+#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/MyFitnessPal.png
+#!openUrl=https://apps.apple.com/app/id341232718
+
+[Script]
+# > MyFitnessPal解锁Premium
+MyFitnessPal解锁Premium = type=http-response, pattern=^https?:\/\/(premium-api\.myfitnesspal|subscriptions-api\.superwall)\.com\/v\d\/subscriptions\/MFP\/*, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/JS/MyFitnessPal/JS/MyFitnessPal.js, requires-body=true, max-size=-1, timeout=60
+
+[MITM]
+hostname = %APPEND% premium-api.myfitnesspal.com, subscriptions-api.superwall.com
