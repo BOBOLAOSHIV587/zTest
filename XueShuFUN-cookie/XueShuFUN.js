@@ -74,6 +74,8 @@ function autoCheckIn() {
                 $.msg("学术Fun签到", "❌ 响应解析失败", data.slice(0, 100));
             }
         }
+        // 异步请求完成后结束脚本
+        $done();
     });
 }
 
