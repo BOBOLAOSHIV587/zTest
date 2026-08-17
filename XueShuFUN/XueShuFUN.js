@@ -6,7 +6,7 @@
 const $ = new Env("学术Fun签到");
 
 // 您提供的 Cookie
-const cookie = "bobolaoshi%7C1787081300%7Cf0z8aI9zFSUuyxtAxzHCLtYgC9xPdjWrqtGMt2WZ01M%7C969581957ab8e95aa8b8ef402e10bdf85a31fd7a1de6b0c1a6cd0af2e5484cc7";
+const cookie = "eli%7C1788193426%7CeEuszvsZdNDL4rjF6h19YuWvOmc3WvP3oDt7T3Oall1%7C98ced26eb436ca0e32b13fdc05c10c820ea36de9fe3aef1c3ffd22620d560895";
 
 async function main() {
     // 常见的签到接口路径（如果签到失败，请通过一次抓包确认实际的签到 URL）
