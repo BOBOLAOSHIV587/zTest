@@ -1,10 +1,8 @@
 #!name = 学术FUN 自动签到
-#!desc = 自动获取 xueshu.fun 的 Cookie/UA 并每日自动签到
-#!category = 签到
 
 [Script]
 xueshu-get-cookie = type=http-request,pattern=^https:\/\/xueshu\.fun\/,requires-body=false,max-size=0,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN/Get-Cookie.js,timeout=15
-xueshu-checkin = type=cron,cron="30 8 * * *",script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN/CheckIn.js,timeout=30
+xueshu-checkin = type=cron,cronxp="30 8 * * *",script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN/CheckIn.js,timeout=30
 
 [MITM]
 hostname = %APPEND% xueshu.fun
