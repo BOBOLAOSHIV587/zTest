@@ -4,8 +4,8 @@
 
 
 [Script]
-xueshu-get-cookie = type=http-request,pattern=^https:\/\/xueshu\.fun\/,requires-body=false,max-size=0,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN/Get-Cookie.js,timeout=15
 xueshu-checkin= type=cron,cronexp=0 9 * * *,wake-system=1,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN/CheckIn.js,timeout=60
+xueshu-get-cookie = type=http-request,pattern=^https:\/\/xueshu\.fun\/wp-admin\/admin-ajax\.php,requires-body=false,max-size=0,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN/Get-Cookie.js,timeout=15
 
 [MITM]
 hostname = %APPEND% xueshu.fun
