@@ -1,0 +1,17 @@
+#!name=学术FUN自动签到
+#!desc=学术FUN自动签到
+#!date=2026-08-18
+#!category=🐹 BOBO Task
+#!author= BOBOLAOSHIV587[https://github.com/BOBOLAOSHIV587/Rules]
+#!openUrl=https://xueshu.fun/
+
+[Script]
+# 1. 抓包拦截脚本：当您浏览 xueshu.fun 时自动获取 Cookie
+xueshu_cookie_capture = type=http-request,pattern=https?:\/\/xueshu\.fun\/.+,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN-cookie/XueShuFUN.js,requires-body=false
+
+# 2. 定时签到脚本：每天早上 8 点 30 分自动执行
+xueshu_checkin_cron = type=cron,cronexp=30 8 * * *,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/XueShuFUN-cookie/XueShuFUN.js,wake-up=true
+
+[MITM]
+# 确保开启了目标域名的 Mitm 解密（如果是 HTTPS 站点必需）
+hostname = %APPEND% xueshu.fun
