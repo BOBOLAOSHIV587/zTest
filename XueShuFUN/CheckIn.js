@@ -19,7 +19,7 @@ const userPageUrl = "https://xueshu.fun/user/";
 // ==== 已根据实际抓包确认 ====
 const signAction = "user_qiandao";        // 确认值，来自抓包
 const nonceParamName = "nonce";           // 确认值，来自抓包
-const nonceRegex = /nonce["'\s:=]+([a-f0-9]{10})/i; // 从 /user/ 页面源码里提取 nonce，若提取失败见下方通知提示再调整
+const nonceRegex = /go-user-qiandao[^>]*data-nonce="([a-f0-9]+)"/; // 精确匹配签到按钮 (class="go-user-qiandao") 的 data-nonce 属性
 // ==================================
 
 const cookie = $persistentStore.read(`${domain}_cookie`);
