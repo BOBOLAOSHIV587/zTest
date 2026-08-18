@@ -1,9 +1,5 @@
 #!name=海角社区 自动签到领金币
 #!desc=自动抓取 haijiao.com 的 User-ID、Token、Cookie 及 User-Agent 并每日自动签到
-#!date=2026-08-19
-#!category=🐹 BOBO Task
-#!author= BOBOLAOSHIV587[https://github.com/BOBOLAOSHIV587/Rules],Gemini[https://gemini.google.com/]
-#!icon=https://raw.githubusercontent.com/BOBOLAOSHIV587/Rules/main/Icons/AppIcons/Image/App/HaiJiaoSheQu.png
 #!openUrl=https://haijiao.com/
 #!arguments=禁用脚本:海角获取Cookie,禁用MITM:hostname
 #!arguments-desc=禁用脚本：禁用获取Cookie脚本，输入 # 表示禁用.\n禁用MITM：禁用MITM主机名，默认 hostname 表示启用，输入 # 表示禁用。\n\n此脚本获取Cookie会多次触发，导致Surge崩溃设备发热。获取一次Cookie后关闭即可。
