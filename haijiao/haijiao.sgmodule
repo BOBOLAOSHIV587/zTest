@@ -1,0 +1,13 @@
+#!name = 海角社区 自动签到
+#!desc = 自动抓取 haijiao.com 的 User-ID、Token、Cookie 及 User-Agent 并每日自动签到
+#!category = 签到
+
+[Script]
+# 获取凭据 (当访问海角 API 接口时自动触发保存)
+haijiao-get-cookie = type=http-request,pattern=^https:\/\/www\.haijiao\.com\/api\/,requires-body=false,max-size=0,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/haijiao/Get-Cookie.js,timeout=15
+
+# 定时签到 (每日 08:30 自动执行)
+haijiao-checkin = type=cron,cronexp=30 8 * * *,wake-system=1,script-path=https://github.com/BOBOLAOSHIV587/zTest/raw/main/haijiao/CheckIn.js,timeout=60
+
+[MITM]
+hostname = %APPEND% www.haijiao.com
