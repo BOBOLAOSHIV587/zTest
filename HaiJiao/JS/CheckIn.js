@@ -95,57 +95,6 @@ if (!userId || !token) {
     }
   );
 }
-
-/**
- * 请求用户信息接口获取总金币
- */
-function getUserInfo(headers, callback) {
-  const infoUrl = `https://www.haijiao.com/api/user/info/${userId}`;
-  const infoHeaders = { ...headers, "Referer": "https://www.haijiao.com/user/myinfo" };
-
-  $.get(
-    {
-      url: infoUrl,
-      headers: infoHeaders
-    },
-    (err, resp, data) => {
-      if (err || !data) {
-        callback(null);
-        return;
-      }
-      try {
-        const json = JSON.parse(data);
-        if (json.success && json.data) {
-          let decoded = json.isEncrypted ? $.base64Decode(json.data) : json.data;
-          
-          if (typeof decoded === "object") {
-            callback(decoded);
-            return;
-          }
-
-          try {
-            const userObj = JSON.parse(decoded);
-            callback(userObj);
-            return;
-          } catch (e) {
-            const goldMatch = decoded.match(/["']gold["']\s*:\s*(\d+)/);
-            const nameMatch = decoded.match(/["']nickname["']\s*:\s*["']([^"']+)["']/);
-            
-            callback({
-              gold: goldMatch ? goldMatch[1] : undefined,
-              nickname: nameMatch ? nameMatch[1] : undefined
-            });
-            return;
-          }
-        }
-      } catch (e) {
-        // ignore error
-      }
-      callback(null);
-    }
-  );
-}
-
 // ==================== 兼容环境库 (优化 Base64 解码) ====================
 function Env(name) {
   this.name = name;
