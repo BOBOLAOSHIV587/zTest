@@ -1,6 +1,6 @@
 /*
- * 海角社区 (haijiao.com) - 自动签到 (修复与结构优化版)
- * 兼容：Quantumult X / Loon / Surge
+ * 海角社区 (haijiao.com) - 自动签到
+ * 适用：QX / Loon / Surge
  */
 
 const $ = new Env("海角社区 - 签到");
@@ -15,10 +15,10 @@ const ua = $.getdata(`${domain}_ua`) || "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3
 let cookie = $.getdata(`${domain}_cookie`) || `mainshow=true; token=${token}; uid=${userId}`;
 
 if (!userId || !token) {
-  $.msg("海角社区签到失败 ❌", "", "未检测到凭据，请先用浏览器登录海角社区触发抓取");
+  $.msg("海角社区签到失败 ❌", "", "未检测到凭据，请先用手机浏览器登录海角社区触发抓取");
   $.done();
 } else {
-  // 通用 Request Header
+  // 构建抓包所要求的核心请求头
   const requestHeaders = {
     "Host": "www.haijiao.com",
     "Accept": "application/json, text/plain, */*",
@@ -32,12 +32,11 @@ if (!userId || !token) {
     "Cookie": cookie
   };
 
-  // 1. 发起签到请求
   $.post(
     {
       url: checkInUrl,
       headers: requestHeaders,
-      body: ""
+      body: "" // 抓包显示 content-length: 0
     },
     (err, resp, data) => {
       if (err) {
@@ -48,54 +47,27 @@ if (!userId || !token) {
 
       try {
         const json = JSON.parse(data);
-        let signResultMsg = "";
-        let isSuccess = false;
-
         if (json.success === true) {
-          isSuccess = true;
-          let decryptedData = "";
-          
-          if (json.isEncrypted && json.data) {
-            decryptedData = $.base64Decode(json.data);
-          } else if (typeof json.data === "string") {
-            decryptedData = json.data;
-          } else if (typeof json.data === "object") {
-            decryptedData = JSON.stringify(json.data);
-          }
-
-          // 提取连续签到天数和本次获得金币
-          const daysMatch = decryptedData.match(/["']?(?:count|day|days)["']?\s*[:=]\s*["']?(\d+)["']?/i) || decryptedData.match(/(\d+)\s*(天|day)/i);
-          const goldMatch = decryptedData.match(/["']?(?:gold|reward|coin)["']?\s*[:=]\s*["']?(\d+)["']?/i) || decryptedData.match(/(\d+)\s*(金币|gold)/i);
-
-          const days = daysMatch ? daysMatch[1] : null;
-          const rewardGold = goldMatch ? goldMatch[1] : null;
-
-          let details = [];
-          if (days) details.push(`已连续签到 ${days} 天`);
-          if (rewardGold) details.push(`获得 ${rewardGold} 金币`);
-
-          signResultMsg = details.length > 0 ? details.join("，") : "签到成功 🎉";
+          $.msg("海角社区签到成功 🎉", "", "签到成功！奖励金币已到账");
         } else {
-          signResultMsg = json.message || "今日已签到过";
+          const errMsg = json.message || "未知错误";
+          // 优化重复签到的判断逻辑
+          if (json.errorCode === 0 || errMsg.includes("已签到")) {
+            $.msg("海角社区签到提示 ℹ️", "", "今日已完成签到，无需重复操作");
+          } else {
+            $.msg("海角社区签到失败 ❌", "", `原因: ${errMsg} (代码: ${json.errorCode})`);
+          }
         }
-
-          // 3. 构建规范化的通知格式
-          const title = isSuccess ? "海角社区 签到成功 🎉" : "海角社区 签到提示 ℹ️";
-          const subtitle = signResultMsg; // 格式: 已连续签到 X 天，获得 X 金币 / 今日已签到过
-          const body = `账号: ${nicknameStr}\n💰 账户总金币: ${totalGoldStr}`;
-
-          $.msg(title, subtitle, body);
-          $.done();
-        });
-
       } catch (e) {
-        $.msg("海角社区 签到异常 ❌", "", `解析响应失败: ${e.message || e}`);
-        $.done();
+        const statusCode = resp ? (resp.status || resp.statusCode || "未知") : "未知";
+        $.msg("海角社区签到响应解析失败 ❌", "", `HTTP 状态码: ${statusCode}\n返回原文: ${data ? data.slice(0, 100) : "空"}`);
       }
+      $.done();
     }
   );
 }
-// ==================== 兼容环境库 (优化 Base64 解码) ====================
+
+// ==================== 兼容环境库 (Env.js) ====================
 function Env(name) {
   this.name = name;
   this.isLoon = typeof $loon !== "undefined";
@@ -110,21 +82,6 @@ function Env(name) {
     if (this.isQX) $notify(title, subt, desc);
     if (this.isLoon || this.isSurge) $notification.post(title, subt, desc);
   };
-  this.get = (options, callback) => {
-    if (this.isQX) {
-      if (typeof options === "string") options = { url: options };
-      options.method = "GET";
-      $task.fetch(options).then(
-        (res) => callback(null, res, res.body),
-        (err) => callback(err.error, null, null)
-      );
-    }
-    if (this.isLoon || this.isSurge) {
-      $httpClient.get(options, (err, response, body) => {
-        callback(err, response, body);
-      });
-    }
-  };
   this.post = (options, callback) => {
     if (this.isQX) {
       if (typeof options === "string") options = { url: options };
@@ -138,27 +95,6 @@ function Env(name) {
       $httpClient.post(options, (err, response, body) => {
         callback(err, response, body);
       });
-    }
-  };
-  // 自定义纯 JS 实现的 Base64 解码，确保在 QX/Loon/Surge 下 100% 可用
-  this.base64Decode = (str) => {
-    if (!str) return "";
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    let output = "";
-    str = String(str).replace(/=+$/, "");
-    for (
-      let bc = 0, bs, buffer, idx = 0;
-      (buffer = str.charAt(idx++));
-      ~buffer && ((bs = bc % 4 ? bs * 64 + buffer : buffer), bc++ % 4)
-        ? (output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6))))
-        : 0
-    ) {
-      buffer = chars.indexOf(buffer);
-    }
-    try {
-      return decodeURIComponent(escape(output));
-    } catch (e) {
-      return output;
     }
   };
   this.done = (val = {}) => {
