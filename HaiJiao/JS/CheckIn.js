@@ -79,16 +79,6 @@ if (!userId || !token) {
           signResultMsg = json.message || "今日已签到过";
         }
 
-        // 2. 获取个人信息（查询账号及总金币）
-        getUserInfo(requestHeaders, (userInfo) => {
-          let totalGoldStr = "未知";
-          let nicknameStr = "未知账号";
-
-          if (userInfo) {
-            if (userInfo.gold !== undefined) totalGoldStr = `${userInfo.gold}`;
-            if (userInfo.nickname) nicknameStr = userInfo.nickname;
-          }
-
           // 3. 构建规范化的通知格式
           const title = isSuccess ? "海角社区 签到成功 🎉" : "海角社区 签到提示 ℹ️";
           const subtitle = signResultMsg; // 格式: 已连续签到 X 天，获得 X 金币 / 今日已签到过
