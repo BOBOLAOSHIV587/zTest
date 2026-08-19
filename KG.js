@@ -1,222 +1,126 @@
+/*
+ *
+ *
+#!name= 网易云音乐 𝕏
+#!desc= 对 网易云音乐 深度学习探索;
+#!author= 
+#!homepage = https://apps.apple.com/app/id590338362
+#!icon= https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/2d/e8/1b/2de81bfd-29a0-d067-63c3-38315cc1661a/AppIcon-1x_U007emarketing-0-9-0-0-85-220-0.png/460x0w.webp
+
+[Argument]
+MY = switch,true,false,tag=隐藏[底部-漫游标签],desc=关闭开关将不对此选项生效
+DT = switch,true,false,tag=隐藏[底部-笔记标签],desc=关闭开关将不对此选项生效
+FX = switch,true,false,tag=隐藏[底部-发现标签],desc=关闭开关将不对此选项生效
+GZ = switch,true,false,tag=隐藏[底部-关注标签],desc=关闭开关将不对此选项生效
+
+PRGG = switch,true,false,tag=隐藏[首页-问候语],desc=关闭开关将不对此选项生效
+PRRK = switch,false,true,tag=隐藏[首页-排行榜],desc=关闭开关将不对此选项生效
+PRDRD = switch,true,false,tag=隐藏[首页-每日推荐],desc=关闭开关将不对此选项生效
+PRSCVPT = switch,false,true,tag=隐藏[首页-推荐歌单],desc=关闭开关将不对此选项生效
+PRST = switch,true,false,tag=隐藏[首页-最近常听],desc=关闭开关将不对此选项生效
+PRRR = switch,true,false,tag=隐藏[首页-雷达歌单],desc=关闭开关将不对此选项生效
+HMPR = switch,true,false,tag=隐藏[首页-音乐合伙人],desc=关闭开关将不对此选项生效
+PRMST = switch,true,false,tag=隐藏[首页-推荐专属歌单],desc=关闭开关将不对此选项生效
+PRCN = switch,true,false,tag=隐藏[首页-你的专属歌单],desc=关闭开关将不对此选项生效
+
+VIP = switch, false, tag = [启用]会员, desc = 关闭开关将不对此选项生效
+
+Cookie = input, "MUSIC_U=00611AB6CF97A35EE63C8292BA30F39D1188B44D76049213A858DBF1E237F7C5D22F1F7DE6731D3A00C6CAC23C0C6B4FDFDECD2137355C919FAEC36152A9B2969B66E0949D150F40AC1E3BE0BE66832D66F2C915EC27815867338CB568FF214B855A8C251116C168491FD5DADA4F97D554637EFBB03282E0507CD3701781721CE73249B2E07B9477FCB02065CE6EAD79065E0AD6D390E10F30B941A5519C946BD9FF00D6BED3E8B0DED2AA910583814D6398E5B0DD5A5434E31AA17DD5734897A7C46A007726AE2AF69EB5E8C59D4F70C5E064B22786D06968838EE9451A79E90FEDB1B11CD0132849B53438BAB07B48D6F9B1C60DC485CF06488C1E02C2D7D1F18B96110124F0A81394D59201CB6332546D6D34350A509F2734807D8AD2C467A82DDEC5E3965E34C86799217ED18FABF6FB84100702BC7BE456BC608C04524D7B3258BA45272E9649976B9A9B115CD17F35E6CDCDDEF69AB6E1613483F0DB1749191DDD4EA0220107A189A8DBBFCBE26E; caid={"lastIyunId":"c188fda5639eb7665faa8f12acce7976","iyunId":"8b2f57388088a1c2c7134fa625ad9375","iyunVersion":"20230330","lastIyunVersion":"20220111"}; buildver=5342; sDeviceId=9ec0847264c088b44ca5c2b5ee94cdab; channel=distribution; idfa=00000000-0000-0000-0000-000000000000; packageType=release; appver=9.3.60; deviceId=YD-9Ax/xiQscpNFGlFUREaQ6SU1wt1sfjoY; EVNSM=1.0.0; os=iPhone OS; osver=26.0; machineid=iPhone17.2; NMCID=jnvwlk.1721320815000.01.3; appkey=IuRPVVmc3WWul9fT; idfv=B2B23496-210B-40C0-B47B-C5AF4DADE41B; URS_APPID=B4300E3591BDEC0BDAD47C5B75AA09E2A1A402C0FEBDE5407986A72C8CE16DF5B6293116B121D6872A9FEA6913295501; NMDI=Q1NKTQcBDACpwlhh4qjU5lexqyeVAAAAbZiUDNNCRngAWM2rEgug/WjKgNVQj/xthQgCnQDkMe+BlTWRTXWFgjgWN+glqEGrkcrlNfCDMz93tohH8Qylg8SfY75c1x16qZaiYvB++3K7vPs++grPNlMDe+zFTWy0oZVDQcLVOEfzFL1lMn8eVOE3QjGclQdPuWKM2gHbkYVNxP5QrC9f75m/8Rnyw+c9MJPQ1ds=", tag = Cookie, desc = 必填
+MConfigInfo = input, "{"IuRPVVmc3WWul9fT":{"version":94394368,"appver":"9.3.60"},"zr4bw6pKFDIZScpo":{"version":3186688,"appver":"9.3.60"},"tPJJnts2H31BZXmp":{"version":4026368,"appver":"2.0.30"}}", tag = MConfig-Info ,desc = 选填
+UserAgent = input, "NeteaseMusic 9.3.60/6160 (iPhone; iOS 26.0; zh_CN)", tag = User-Agent, desc = 选填
+
+[Rule]
+DOMAIN, iadmat.nosdn.127.net, REJECT
+DOMAIN, iadmatapk.nosdn.127.net, REJECT
+DOMAIN, iadmusicmat.music.126.net, REJECT
+DOMAIN, iadmusicmatvideo.music.126.net, REJECT
+DOMAIN, ipv4.music.163.com, REJECT
+DOMAIN, ipv6.music.163.com, REJECT
+
+[Rewrite]
+^https?://interface.*\.music\.163\.com/eapi/ad/get url reject
+^https?://interface.*\.music\.163\.com/eapi/ad/config/get url reject
+^https?://interface.*\.music\.163\.com/eapi/ad/iyunIds url reject
+^https?://interface.*\.music\.163\.com/eapi/ad/prefetch/select url reject
+^https?://interface.*\.music\.163\.com/eapi/ad/loading/current url reject
+
+^https?:\/\/interface\d?\.music\.163\.com\/e?api\/(ocpc\/)?ad\/ mock-response-body data-type=text
+^https?:\/\/interface\d?\.music\.163\.com\/eapi\/(?:delivery\/(batch-)?deliver|moment\/tab\/info\/|side-bar\/mini-program\/music-service\/account|yunbei\/account\/entrance\/) reject-dict
+^https?:\/\/interface\d?\.music\.163\.com\/eapi\/(?:community\/friends\/fans-group\/artist\/group\/|mine\/applet\/redpoint|music\/songshare\/text\/recommend\/|resniche\/position\/play\/new\/|resniche\/tspopup\/show|resource\/comments?\/musiciansaid\/|user\/sub\/artist) reject-dict
+^https?:\/\/interface\d?\.music\.163\.com\/eapi\/(?:ios\/version|mlivestream\/entrance\/playpage\/|link\/position\/show\/strategy|link\/scene\/show\/resource|v1\/content\/exposure\/comment\/banner\/) reject-dict
+^https?:\/\/interface\d?\.music\.163.com\/w?e?api\/search\/default mock-response-body data-type=text
+^https?:\/\/interface\d?\.music\.163\.com\/w?eapi\/(?:activity\/bonus\/playpage\/time\/query|resource-exposure\/|search\/(?:chart\/|rcmd\/keyword\/|specialkeyword\/)) reject-dict
+^https:\/\/interface\d\.music\.163\.com\/eapi\/my\/podcast\/tab\/recommend reject-dict
+
+[Script]
+http-response ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/(?:batch|v2\/resource\/comment\/floor\/get) script-path=https://he2o.vercel.app/Resource/Script/Ad/wyres.js, requires-body=true, binary-body-mode=true, timeout=20, tag=评论区、热推、有话想说、分享一下、歌曲下祝福
+http-response ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/(?:homepage\/block\/page|link\/page\/rcmd\/(?:block\/resource\/multi\/refresh|resource\/show)) script-path=https://he2o.vercel.app/Resource/Script/Ad/wyres.js, requires-body=true, binary-body-mode=true, timeout=20, tag=推荐、主页, argument=[{PRGG},{PRRK},{PRDRD},{PRSCVPT},{PRST},{PRRR},{HMPR},{PRMST},{PRCN}]
+http-response ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/link\/home\/framework\/tab script-path=https://he2o.vercel.app/Resource/Script/Ad/wyres.js, requires-body=true, binary-body-mode=true, timeout=20, tag=底部选项卡, argument=[{MY},{DT},{FX},{GZ}]
+http-response ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/link\/page\/discovery\/resource\/show script-path=https://he2o.vercel.app/Resource/Script/Ad/wyres.js, requires-body=true, binary-body-mode=true, timeout=20, tag=发现页
+http-response ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/link\/position\/show\/resource script-path=https://he2o.vercel.app/Resource/Script/Ad/wyres.js, requires-body=true, binary-body-mode=true, timeout=20, tag=我的页面
+http-response ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/user\/follow\/users\/mixed\/get script-path=https://he2o.vercel.app/Resource/Script/Ad/wyres.js, requires-body=true, binary-body-mode=true, timeout=20, tag=显示未关注你的人
+
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/playermode\/ script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=皮肤, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/search\/(?:complex\/page|complex\/rec\/song\/get|song\/list\/page) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=歌曲、听书, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/v3\/song\/detail script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=歌曲、听书, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/song\/(?:chorus|enhance\/|play\/|type\/detail\/get) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=歌曲、听书, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/(?:v1\/artist\/top\/song|v3\/discovery\/recommend\/songs) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=歌曲、听书, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/vipnewcenter\/app\/resource\/newaccountpage script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=等级, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/w?e?api\/(homepage\/|v6\/)?playlist\/(?!(?:delete|subscribe|unsubscribe)) script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=首页歌单, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+http-request ^https?:\/\/interface\d?\.music\.163\.com\/eapi\/vipauth\/app\/auth\/(soundquality\/)?query script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js, timeout=60, tag=音质, enable={VIP}, argument=[{Cookie},{MConfigInfo},{UserAgent}]
+
+[Mitm]
+hostname = interface*.music.163.com
+*
+*
+*/
 
 
 
 
-/**
- * Surge 节点连通性及阻断检测脚本
- * 适配自 Quantumult X 脚本 (作者：https://github.com/RavelloH)
- * * 功能：
- * 检测当前策略组选中的节点是否可连接，并判断是否被运营商/GFW 阻断
 
-script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/KG.js
 
- */
+/*
+ *
+ *
+var NeteaseHeaders = $request.headers;
+NeteaseHeaders['mconfig-info'] = '{"zr4bw6pKFDIZScpo":{"version":1830912,"appver":"9.3.60"},"tPJJnts2H31BZXmp":{"version":3194880,"appver":"2.0.30"},"c0Ve6C0uNl2Am0Rl":{"version":598016,"appver":"1.7.50"},"IuRPVVmc3WWul9fT":{"version":52744192,"appver":"9.3.60"}}';
+NeteaseHeaders['cookie'] = 'MUSIC_U=00307B2CF8B0CC0C8D822BEF538D02760A54DA0214E64629E2DF3CB46DAB7A19C9E0B620421F3DBCB66B5EF1DF9912236F7F7CD242908C4F7494ED2CD2977C4A5A254744B110ABE92EDF9ABE3BE85D4A2FBDA0C7439D73C95227A2EF9DFEB044455674C7A6F4983CA52F0555DE667B4A49FC4A64C73E83669FB1B0AF3274896ED321F649DB4B57A4181D032AADE96F181227B1FDF1063299F44B6524B265E17FE164E6A4A8D015962D8DF9D8242C1961766CF84BA2BF44A4BE4F8D1D254186FDFBD31490FF90D90CF1B23C2E32768479467B5DBA296697E64209C5F589C711CC3F8D9B185CFB4661D38D78867EE179CA7773BF757D0AD3ACC41096161D3E62609022106FF0FA3D23BC88141A2E78C8BC926EBFB3F83FFED1642411993898E5EA07; caid={"lastIyunId":"c188fda5639eb7665faa8f12acce7976","iyunId":"8b2f57388088a1c2c7134fa625ad9375","iyunVersion":"20230330","lastIyunVersion":"20220111"}; buildver=5342; sDeviceId=9ec0847264c088b44ca5c2b5ee94cdab; channel=distribution; idfa=00000000-0000-0000-0000-000000000000; packageType=release; appver=9.3.60; deviceId=YD-9Ax/xiQscpNFGlFUREaQ6SU1wt1sfjoY; EVNSM=1.0.0; os=iPhone OS; osver=15.3.1; machineid=iPhone14.2; NMCID=jnvwlk.1721320815000.01.3; appkey=IuRPVVmc3WWul9fT; idfv=B2B23496-210B-40C0-B47B-C5AF4DADE41B; URS_APPID=B4300E3591BDEC0BDAD47C5B75AA09E2A1A402C0FEBDE5407986A72C8CE16DF5B6293116B121D6872A9FEA6913295501; NMDI=Q1NKTQcBDACpwlhh4qjU5lexqyeVAAAAbZiUDNNCRngAWM2rEgug/WjKgNVQj/xthQgCnQDkMe+BlTWRTXWFgjgWN+glqEGrkcrlNfCDMz93tohH8Qylg8SfY75c1x16qZaiYvB++3K7vPs++grPNlMDe+zFTWy0oZVDQcLVOEfzFL1lMn8eVOE3QjGclQdPuWKM2gHbkYVNxP5QrC9f75m/8Rnyw+c9MJPQ1ds=';
+NeteaseHeaders['user-agent'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 CloudMusic/0.1.1 NeteaseMusic/8.20.30';
 
-// ====== 配置项 ======
-const TARGET_GROUP = "PROXY"; // 你想要检测的 Surge 策略组名称（请根据实际情况修改，如 "Proxy"、"节点选择" 等）
-const IP_API = "http://ip-api.com/json?lang=zh-CN";
-const CHECK_HOST = "https://check-host.net";
-const TIMEOUT = 8000;
+$done({headers : NeteaseHeaders});
+*
+*
+*/
+const url = $request.url;
+const header = $request.headers;
+const isNetEase = url.includes("/interface") && url.includes(".music.163.com/");
 
-// ====== 异步 HTTP 封装 ======
-function httpFetch(options) {
-  return new Promise((resolve, reject) => {
-    $httpClient.get(options, function(error, response, data) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve({ body: data, status: response.status });
-      }
-    });
-  });
-}
+if (isNetEase) {
+    const cookie = $argument?.Cookie;
+    const mconfig = $argument?.MConfigInfo;
+    const userAgent = $argument?.UserAgent;
 
-function surgeApi(method, path, body) {
-  return new Promise((resolve) => {
-    $surge.httpAPI(method, path, body, (result) => {
-      resolve(result);
-    });
-  });
-}
+    if (!cookie || !mconfig || !userAgent) {
+        console.log("参数缺失信息：");
+        if (!cookie) console.log("❌ Cookie 参数缺失");
+        if (!mconfig) console.log("❌ MConfigInfo 参数缺失");
+        if (!userAgent) console.log("❌ UserAgent 参数缺失");
 
-async function run() {
-  let host = null, port = null, nodeName = "未知节点";
-
-  try {
-    // 1. 获取当前选中的节点名称
-    const groupData = await surgeApi("GET", "/v1/policy_groups", null);
-    if (groupData && groupData[TARGET_GROUP]) {
-      nodeName = groupData[TARGET_GROUP];
+        $notification.post(
+            "网易云音乐遇到问题",
+            "参数缺失",
+            "请在插件内填入会员数据"
+        );
+        $done({});
     } else {
-      return done(`未找到策略组: ${TARGET_GROUP}`);
+        header["cookie"] = cookie;
+        header["mconfig-info"] = mconfig;
+        header["user-agent"] = userAgent;
+
+        console.log("✅ 网易云音乐会员已解锁 🎉");
+        $done({ headers: header });
     }
-
-    // 2. 获取该节点的具体配置 (IP/Port)
-    const policyData = await surgeApi("GET", `/v1/policies/detail?policy_name=${encodeURIComponent(nodeName)}`, null);
-    if (policyData && policyData.server) {
-      host = policyData.server;
-      port = policyData.port;
-    }
-  } catch (e) {
-    // 若获取失败则继续，但无法进行远端探测
-  }
-
-  startChecks(nodeName, host, port);
+} else {
+    $done({});
 }
-
-function startChecks(tag, host, port) {
-  // 本地代理测试 (走选中的节点)
-  var pA = httpFetch({ url: IP_API, policy: tag, timeout: TIMEOUT })
-    .then(function(r) { return { src: "node", ok: true, data: JSON.parse(r.body) }; })
-    .catch(function() { return { src: "node", ok: false }; });
-
-  // 本地直连测试
-  var pB = httpFetch({ url: IP_API, timeout: TIMEOUT })
-    .then(function(r) { return { src: "direct", ok: true, data: JSON.parse(r.body) }; })
-    .catch(function() { return { src: "direct", ok: false }; });
-
-  // 远端 TCP 探测
-  var pC;
-  if (host && port) {
-    var target = host + ":" + port;
-    var checkUrl = CHECK_HOST + "/check-tcp?host=" + encodeURIComponent(target) + "&max_nodes=10";
-    pC = httpFetch({ url: checkUrl, headers: { "Accept": "application/json" }, timeout: TIMEOUT })
-      .then(function(r) {
-        var d = JSON.parse(r.body);
-        if (!d.ok || !d.request_id) return { src: "remote", ok: false, error: "远端提交失败" };
-        var rid = d.request_id;
-        var nodeList = d.nodes || {};
-        var nodeNames = Object.keys(nodeList);
-        var countryMap = {};
-        nodeNames.forEach(function(n) {
-          var info = nodeList[n];
-          if (info && info.length >= 1) countryMap[n] = info[0];
-        });
-        return new Promise(function(resolve) {
-          setTimeout(function() {
-            httpFetch({ url: CHECK_HOST + "/check-result/" + rid, headers: { "Accept": "application/json" }, timeout: TIMEOUT })
-              .then(function(r2) {
-                var res = JSON.parse(r2.body);
-                var reachable = false;
-                var items = [];
-                nodeNames.forEach(function(n) {
-                  var cc = countryMap[n] || "";
-                  var flag = cc ? getFlag(cc) : "🌍";
-                  var nr = res[n];
-                  var ms = '--.--ms';
-                  if (nr && Array.isArray(nr) && nr.length > 0 && nr[0].time !== undefined) {
-                    reachable = true;
-                    ms = formatMs(nr[0].time * 1000);
-                  }
-                  items.push({ flag: flag, ms: ms });
-                });
-                resolve({ src: "remote", ok: reachable, data: items });
-              }, function() {
-                resolve({ src: "remote", ok: false, error: "远端查询失败" });
-              });
-          }, 3500);
-        });
-      })
-      .catch(function() { return { src: "remote", ok: false, error: "远端请求失败" }; });
-  } else {
-    pC = Promise.resolve({ src: "remote", ok: false, error: "无节点地址信息" });
-  }
-
-  Promise.allSettled([pA, pB, pC]).then(function(results) {
-    render(tag, results[0].value, results[1].value, results[2].value);
-  });
-}
-
-function formatMs(ms) {
-  if (ms >= 10000) return Math.floor(ms) + "ms";
-  if (ms >= 1000) return Math.floor(ms).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "ms";
-  if (ms >= 100) return ms.toFixed(1) + "ms";
-  if (ms >= 10) return ms.toFixed(2) + "ms";
-  return ms <= 0 ? "0.00ms" : ms.toFixed(3) + "ms";
-}
-
-function render(tag, node, direct, remote) {
-  var nOk = node && node.ok;
-  var dOk = direct && direct.ok;
-  var rOk = remote && remote.ok;
-
-  var parts = [];
-
-  // 标题与当前节点
-  parts.push(`📍 当前检测节点: ${tag || "未知"}`);
-  parts.push("--------------------------------");
-
-  // 节点代理
-  var nodeStr = `ℹ️ 节点代理: ` + (nOk ? "✅ 正常" : "❌ 不可达");
-  if (nOk && node.data) {
-    var d = node.data;
-    nodeStr += `\n   IP: ${d.query}`;
-    nodeStr += `\n   位置: ${[d.country, d.regionName, d.city].filter(Boolean).join(" - ")}`;
-    nodeStr += `\n   ISP: ${d.isp || "未知"}`;
-  }
-  parts.push(nodeStr);
-
-  // 本机网络
-  parts.push(`🌐 本机网络: ` + (dOk ? "✅ 正常" : "❌ 异常"));
-
-  // 远端探测
-  var remoteStr = `📡 远端探测: ` + (rOk ? "✅ 可达" : "❌ 不可达");
-  if (remote && remote.data && remote.data.length > 0) {
-    var items = remote.data;
-    var row = [];
-    for (var i = 0; i < items.length; i += 2) {
-      var left = items[i];
-      var right = i + 1 < items.length ? items[i + 1] : null;
-      var line = `   ${left.flag} ${left.ms}`;
-      if (right) {
-        line += `   |   ${right.flag} ${right.ms}`;
-      }
-      row.push(line);
-    }
-    remoteStr += "\n" + row.join("\n");
-  } else if (remote && remote.error) {
-    remoteStr += `\n   提示: ${remote.error}`;
-  }
-  parts.push(remoteStr);
-
-  parts.push("--------------------------------");
-
-  // 诊断结论
-  var conclusion = "📋 诊断结论: ";
-  if (!dOk) {
-    conclusion += "⚠️ 本机网络异常";
-  } else if (nOk && rOk) {
-    conclusion += "✅ 节点完全正常";
-  } else if (!nOk && rOk && dOk) {
-    conclusion += "🚫 疑似被运营商/GFW 阻断 (外部可达, 本地不通)";
-  } else if (!nOk && !rOk && dOk) {
-    conclusion += "💤 节点已离线 (全球不可达)";
-  } else {
-    conclusion += "❓ 数据不完整";
-  }
-  parts.push(conclusion);
-
-  $done({
-    title: "🌐 节点阻断检测",
-    content: parts.join("\n\n"),
-    icon: "bolt.horizontal.circle.fill",
-    "icon-color": nOk ? "#2ecc71" : "#e74c3c"
-  });
-}
-
-function getFlag(cc) {
-  if (!cc || cc.length !== 2) return "🌍";
-  var cp = cc.toUpperCase().split('').map(function(c) { return 127397 + c.charCodeAt(); });
-  return String.fromCodePoint.apply(null, cp);
-}
-
-function done(msg) {
-  $done({
-    title: "🌐 节点阻断检测",
-    content: `🛑 出错: ${msg}`,
-    icon: "exclamationmark.triangle.fill",
-    "icon-color": "#e67e22"
-  });
-}
-
-run();
