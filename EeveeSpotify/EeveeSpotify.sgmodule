@@ -1,27 +1,19 @@
 #!name=EeveeSpotify Network Port
 #!desc=Surge module based on EeveeSpotify dylib network logic
 
+[Rule]
+DOMAIN-SUFFIX,lrclib.net,DIRECT
+DOMAIN-SUFFIX,musixmatch.com,DIRECT
+DOMAIN-SUFFIX,genius.com,DIRECT
+DOMAIN-SUFFIX,spicylyrics.org,DIRECT
+DOMAIN-SUFFIX,petitlyrics.com,DIRECT
+DOMAIN,sponsor.ajay.app,REJECT
 
 [Script]
-# Premium / Remote Config
-http-response ^https:\/\/api\.spotify\.com\/v1\/(config|settings|remote-config).* script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/EeveeSpotify/JS/SpotifyHidePremium.js,requires-body=true
-
-
-# Ads Feature Flags
-
+http-response ^https:\/\/api\.spotify\.com\/v1\/.* script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/EeveeSpotify/JS/EeveeSpotify.js,requires-body=true
 http-response ^https:\/\/api\.spotify\.com\/v1\/.* script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/EeveeSpotify/JS/SpotifyAds.js,requires-body=true
-
-
-# OAuth
-
 http-request ^https:\/\/accounts\.spotify\.com\/.* script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/EeveeSpotify/JS/SpotifyToken.js
-
-
-# Lyrics
-
 http-response ^https:\/\/(lrclib\.net|apic\.musixmatch\.com|api\.genius\.com|api\.spicylyrics\.org|p1\.petitlyrics\.com)\/.* script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/EeveeSpotify/JS/SpotifyLyrics.js,requires-body=true
-
-
 
 [MITM]
 hostname = %APPEND% api.spotify.com, accounts.spotify.com, lrclib.net, apic.musixmatch.com, api.genius.com, api.spicylyrics.org, p1.petitlyrics.com
