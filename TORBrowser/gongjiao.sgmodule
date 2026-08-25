@@ -1,13 +1,6 @@
-#!name = 掌上公交去广告
-#!desc = 拦截掌上公交开屏广告、Banner、弹窗广告及第三方广告SDK，纯reject无需外部脚本
-#!system = ios
-#!version = 2.0.0
-#!author = 自制
+[Header Rewrite]
+# GitHub Raw 网页直接预览
+^https?:\/\/raw\.githubusercontent\.com\/.* header-replace-regex Response Content-Type .* "text/plain; charset=utf-8"
 
-[rewrite_local]
-# > YouTube 强制简体中文字幕
-^https://www\.youtube\.com/api/timedtext\?.*_ytzhsub=1 url script-request-header https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/YT-Sub-Clean.js
-^https://www\.youtube\.com/api/timedtext\? url script-response-body https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
-
-[mitm]
-hostname = www.youtube.com
+[MITM]
+hostname = %APPEND% raw.githubusercontent.com, *.githubusercontent.com
