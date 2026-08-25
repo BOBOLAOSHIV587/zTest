@@ -1,5 +1,10 @@
-let t=$persistentStore.read("Spotify_AccessToken");
-if(t && ($request.url.includes("spicylyrics")||$request.url.includes("musixmatch"))){
- $request.headers.Authorization=t;
+let token=$persistentStore.read("EeveeSpotifyAccessToken");
+
+if(token && (
+$request.url.includes("spicylyrics") ||
+$request.url.includes("musixmatch")
+)){
+ $request.headers.Authorization=token;
 }
+
 $done({});

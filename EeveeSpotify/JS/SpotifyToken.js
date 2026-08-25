@@ -1,7 +1,15 @@
-let t=$request.headers.Authorization||$request.headers.authorization;
-if(!t&&$response.body){
+let token=null;
+
+let h=$request.headers;
+token=h.Authorization || h.authorization || null;
+
+if(!token && $response.body){
  let m=$response.body.match(/access_token["']?\s*:\s*["']([^"']+)/);
- if(m)t="Bearer "+m[1];
+ if(m) token="Bearer "+m[1];
 }
-if(t)$persistentStore.write(t,"Spotify_AccessToken");
+
+if(token){
+ $persistentStore.write(token,"EeveeSpotifyAccessToken");
+}
+
 $done({});
