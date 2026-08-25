@@ -1,6 +1,5 @@
-[Header Rewrite]
-# GitHub Raw 网页直接预览
-^https?:\/\/raw\.githubusercontent\.com\/.* header-replace-regex Response Content-Type .* "text/plain; charset=utf-8"
+[Script]
+GitHub Raw Preview = type=http-response,pattern=^https?:\/\/raw\.githubusercontent\.com\/.*,requires-body=false,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
 
 [MITM]
 hostname = %APPEND% raw.githubusercontent.com, *.githubusercontent.com
