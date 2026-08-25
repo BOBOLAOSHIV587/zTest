@@ -1,5 +1,9 @@
-[Script]
-GitHub Raw Preview = type=http-response,pattern=^https?:\/\/raw\.githubusercontent\.com\/.*,requires-body=false,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
+[Header Rewrite]
+# 1. 强制设为文本格式，允许浏览器渲染代码
+^https?:\/\/raw\.githubusercontent\.com\/.* header-replace-regex Response Content-Type .* "text/plain; charset=utf-8"
+
+# 2. 移除 CSP 拦截，防止浏览器因安全策略静默拒绝渲染内容导致白屏
+^https?:\/\/raw\.githubusercontent\.com\/.* header-del Response Content-Security-Policy
 
 [MITM]
 hostname = %APPEND% raw.githubusercontent.com, *.githubusercontent.com
