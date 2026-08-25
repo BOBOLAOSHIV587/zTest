@@ -1,5 +1,7 @@
-[Script]
-GitHub Raw Web Preview = type=http-response,pattern=^https?:\/\/raw\.githubusercontent\.com\/.*,requires-body=true,script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/refs/heads/main/TORBrowser/JS/TORBrowser.js
+[Header Rewrite]
+http-response ^https:\/\/raw\.githubusercontent\.com\/ header-del Content-Disposition
+http-response ^https:\/\/raw\.githubusercontent\.com\/ header-replace Content-Type "text/plain; charset=utf-8"
+
 
 [MITM]
 hostname = %APPEND% raw.githubusercontent.com, *.githubusercontent.com
