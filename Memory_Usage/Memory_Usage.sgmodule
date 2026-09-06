@@ -1,9 +1,9 @@
 #!name=Surge Monitor
-#!desc=实时监控 Surge 内存占用、运行时间及流量统计（支持 HTTP API 密码认证）。
+#!desc=实时监控 Surge 内存占用、运行时间及流量统计。
 
 [Panel]
-# 将下面 key=后面的内容修改为你在 Surge 设置中配置的 HTTP API 密码
-Surge-Monitor = script-name=surge-monitor, update-interval=5, argument=key=123
+# 直接填写你的密码（例如你的密码是 123456，则写 argument=123456）
+Surge-Monitor = script-name=surge-monitor, update-interval=5, argument=123
 
 [Script]
 surge-monitor = type=generic, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Memory_Usage/JS/Memory_Usage.js, timeout=10
