@@ -2,56 +2,37 @@
  * Surge Monitor
  * 实时显示 Surge 自身的内存占用 / 运行时间 / 上下行流量 / 版本信息
  *
- * 原理：
- * Surge 5.22.0+ (iOS) / 6.9.0+ (Mac) 内置了 Prometheus 格式的
- * 运行时指标接口 GET /v1/metrics，其中包含：
- *   surge_build_info{version,build,system}  版本 / build / 系统
- *   surge_uptime_seconds                    引擎运行时间（秒）
- *   surge_memory_bytes                      引擎进程物理内存占用（字节）
- *   surge_interface_in_bytes_total{...}     各网卡累计下行字节数
- *   surge_interface_out_bytes_total{...}    各网卡累计上行字节数
- * 本脚本请求该接口，解析文本，拼装成面板文案，通过 $done() 返回。
+ * 数据来源：
+ *   $httpAPI('GET', '/v1/traffic')  —— JSON，各网络接口的累计上下行字节数
+ *   $httpAPI('GET', '/v1/metrics')  —— Prometheus 纯文本 (iOS 5.22+ / Mac 6.9+)
+ *                                       包含 surge_memory_bytes / surge_uptime_seconds /
+ *                                       surge_build_info{version,build,system}
  *
- * 使用前置条件：
- * 1) 在 Surge 配置的 [General] 中开启 HTTP API：
- *      http-api = 你的密钥@127.0.0.1:6171
- * 2) 在 [Script] 中声明本脚本时，通过 argument 传入密钥/主机/端口，例如：
- *      surge-monitor = type=generic,script-path=surge-monitor.js,argument=key=你的密钥&port=6171
- *    如果不传 argument，默认使用 key=examplekey, host=127.0.0.1, port=6171，
- *    请务必按自己的实际配置修改，否则无法连接。
+ * 为什么用 $httpAPI 而不是 $httpClient：
+ *   $httpClient 请求 127.0.0.1 会经过 Surge 自己的网络栈(NE/TUN)，在 iOS 上
+ *   经常出现请求连不回自身、以 "Read stream EOF" 报错的问题。
+ *   $httpAPI 是进程内直连调用，不走网络栈，也不需要开启/配置 [General] 里的
+ *   http-api，因此不存在这个问题，也不需要任何 key / host / port 参数。
+ *
+ * 若 Surge 版本过旧、没有 /v1/metrics，内存与运行时间会显示为 "-"，
+ * 其余信息仍会正常显示。
  */
 
-function parseArgument(str) {
-  const result = {};
-  if (!str) return result;
-  str.split('&').forEach(function (pair) {
-    if (!pair) return;
-    const idx = pair.indexOf('=');
-    if (idx === -1) return;
-    const k = decodeURIComponent(pair.slice(0, idx));
-    const v = decodeURIComponent(pair.slice(idx + 1));
-    result[k] = v;
+function api(method, path, body) {
+  return new Promise(function (resolve) {
+    $httpAPI(method, path, body || {}, function (result) {
+      resolve(result);
+    });
   });
-  return result;
 }
 
-const rawArgument = typeof $argument !== 'undefined' ? $argument : '';
-const args = parseArgument(rawArgument);
-
-const apiKey = args.key || 'examplekey';
-const host = args.host || '127.0.0.1';
-const port = args.port || '6171';
-
-const metricsURL =
-  'http://' + host + ':' + port + '/v1/metrics?x-key=' + encodeURIComponent(apiKey);
-
 function formatMB(bytes) {
-  if (!isFinite(bytes)) return '- MB';
+  if (typeof bytes !== 'number' || !isFinite(bytes)) return '-';
   return (bytes / 1024 / 1024).toFixed(2) + ' MB';
 }
 
 function formatUptime(seconds) {
-  if (!isFinite(seconds)) return '-';
+  if (typeof seconds !== 'number' || !isFinite(seconds)) return '-';
   const totalMinutes = Math.floor(seconds / 60);
   const h = Math.floor(totalMinutes / 60);
   const m = totalMinutes % 60;
@@ -59,29 +40,18 @@ function formatUptime(seconds) {
 }
 
 function extractNumber(text, metricName) {
-  // 匹配 "metric_name 数值" 或 "metric_name{labels} 数值"
   const re = new RegExp(metricName + '(?:\\{[^}]*\\})?\\s+([0-9.eE+\\-]+)');
   const m = text.match(re);
   return m ? parseFloat(m[1]) : NaN;
 }
 
-function sumCounter(text, metricName) {
-  const re = new RegExp(metricName + '\\{[^}]*\\}\\s+([0-9.eE+\\-]+)', 'g');
-  let total = 0;
-  let m;
-  while ((m = re.exec(text)) !== null) {
-    total += parseFloat(m[1]);
-  }
-  return total;
-}
-
 function extractBuildInfo(text) {
-  const lineMatch = text.match(/surge_build_info\{([^}]*)\}/);
   const info = {
     version: ($environment && $environment['surge-version']) || '-',
     build: ($environment && $environment['surge-build']) || '-',
     system: ($environment && $environment.system) || '-'
   };
+  const lineMatch = text && text.match(/surge_build_info\{([^}]*)\}/);
   if (lineMatch) {
     const labels = lineMatch[1];
     const v = labels.match(/version="([^"]*)"/);
@@ -94,31 +64,63 @@ function extractBuildInfo(text) {
   return info;
 }
 
-function renderError(message) {
-  $done({
-    title: 'Surge Monitor',
-    content: '获取数据失败：' + message + '\n请检查 HTTP API 是否已在 [General] 中开启，\n以及 argument 中的 key / host / port 是否正确。',
-    icon: 'exclamationmark.triangle.fill',
-    'icon-color': '#FF3B30'
-  });
-}
-
-$httpClient.get({ url: metricsURL, timeout: 5 }, function (error, response, data) {
-  if (error) {
-    renderError(String(error));
-    return;
-  }
-  if (!data || typeof data !== 'string') {
-    renderError('接口未返回数据');
-    return;
-  }
-
+(async function () {
   try {
-    const memoryBytes = extractNumber(data, 'surge_memory_bytes');
-    const uptimeSeconds = extractNumber(data, 'surge_uptime_seconds');
-    const inBytes = sumCounter(data, 'surge_interface_in_bytes_total');
-    const outBytes = sumCounter(data, 'surge_interface_out_bytes_total');
-    const build = extractBuildInfo(data);
+    const args = (function (str) {
+      const r = {};
+      if (!str) return r;
+      str.split('&').forEach(function (p) {
+        const i = p.indexOf('=');
+        if (i === -1) return;
+        r[decodeURIComponent(p.slice(0, i))] = decodeURIComponent(p.slice(i + 1));
+      });
+      return r;
+    })(typeof $argument !== 'undefined' ? $argument : '');
+
+    const icon = args.icon || 'chart.bar.fill';
+    const color = args.color || '#0A84FF';
+
+    // ---- 流量：始终通过 JSON 接口获取，稳定可靠 ----
+    let inBytes = NaN;
+    let outBytes = NaN;
+    try {
+      const traffic = await api('GET', '/v1/traffic');
+      if (traffic && traffic.interface) {
+        inBytes = 0;
+        outBytes = 0;
+        Object.keys(traffic.interface).forEach(function (key) {
+          if (key === 'lo0') return; // 排除本地回环
+          const iface = traffic.interface[key];
+          if (iface) {
+            inBytes += iface.in || 0;
+            outBytes += iface.out || 0;
+          }
+        });
+      }
+    } catch (e) {
+      // 忽略，稍后显示为 "-"
+    }
+
+    // ---- 内存 / 运行时间 / 版本：来自 Prometheus 指标接口 ----
+    let memoryBytes = NaN;
+    let uptimeSeconds = NaN;
+    let build = extractBuildInfo('');
+
+    try {
+      const metrics = await api('GET', '/v1/metrics');
+      if (typeof metrics === 'string' && metrics.length > 0) {
+        memoryBytes = extractNumber(metrics, 'surge_memory_bytes');
+        uptimeSeconds = extractNumber(metrics, 'surge_uptime_seconds');
+        build = extractBuildInfo(metrics);
+      }
+      // 如果 $httpAPI 把结果解析成了对象（理论上不太可能，做个兜底）
+      else if (metrics && typeof metrics === 'object') {
+        if (typeof metrics.surge_memory_bytes === 'number') memoryBytes = metrics.surge_memory_bytes;
+        if (typeof metrics.surge_uptime_seconds === 'number') uptimeSeconds = metrics.surge_uptime_seconds;
+      }
+    } catch (e) {
+      // 版本过旧或接口不存在，忽略，内存/运行时间显示为 "-"
+    }
 
     const content = [
       '内存占用：  ' + formatMB(memoryBytes),
@@ -133,10 +135,15 @@ $httpClient.get({ url: metricsURL, timeout: 5 }, function (error, response, data
     $done({
       title: 'Surge Monitor',
       content: content,
-      icon: 'chart.bar.fill',
-      'icon-color': '#0A84FF'
+      icon: icon,
+      'icon-color': color
     });
   } catch (e) {
-    renderError(e && e.message ? e.message : String(e));
+    $done({
+      title: 'Surge Monitor',
+      content: '获取数据失败：' + (e && e.message ? e.message : String(e)),
+      icon: 'exclamationmark.triangle.fill',
+      'icon-color': '#FF3B30'
+    });
   }
-});
+})();

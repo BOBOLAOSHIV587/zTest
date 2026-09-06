@@ -1,11 +1,11 @@
 #!name = Surge Monitor
-#!desc = 实时显示 Surge 自身内存占用、运行时间、上下行流量与版本信息的信息面板
+#!desc = 实时显示 Surge 自身内存占用、运行时间、上下行流量与版本信息的信息面板（基于 $httpAPI 内部调用，无需开启 HTTP API）
 #!category = 🐹 工具
-#!arguments = key:examplekey, host:127.0.0.1, port:6171, Panel Name:Surge Monitor, update-interval:1, color:#0A84FF, icon:chart.bar.fill
-#!arguments-desc = 请填写你在 Surge [General] 中设置的 http-api 密钥: key\n一般无需修改: host\nhttp-api 端口号,需与 [General] 中一致: port\n面板显示的名称: Panel Name\n面板自动刷新间隔(秒),填 -1 为仅手动刷新: update-interval\n图标颜色(HEX): color\n图标(SF Symbol 名称): icon
+#!arguments = Panel Name:Surge Monitor, update-interval:1, color:#0A84FF, icon:chart.bar.fill
+#!arguments-desc = 面板显示的名称: Panel Name\n面板自动刷新间隔(秒),填 -1 为仅手动刷新: update-interval\n图标颜色(HEX): color\n图标(SF Symbol 名称): icon
 
 [Script]
-surge-monitor = type=generic, timeout=10, script-update-interval=86400, argument=key={{{key}}}&host={{{host}}}&port={{{port}}}, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Memory_Usage/JS/Memory_Usage.js
+surge-monitor = type=generic, timeout=10, script-update-interval=86400, argument=icon={{{icon}}}&color={{{color}}}, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Memory_Usage/JS/Memory_Usage.js
 
 [Panel]
 {{{Panel Name}}} = script-name=surge-monitor, title="Surge Monitor", content="点击刷新以加载数据", update-interval={{{update-interval}}}, icon={{{icon}}}, icon-color={{{color}}}
