@@ -1,0 +1,9 @@
+
+#!name=Surge Monitor
+#!desc=实时监控 Surge 内存占用、运行时间、累计流量及版本信息。
+
+[Panel]
+Surge-Monitor = script-name=surge-monitor, update-interval=5
+
+[Script]
+surge-monitor = type=generic, script-path=https://raw.githubusercontent.com/BOBOLAOSHIV587/zTest/main/Memory_Usage/JS/Memory_Usage.js, timeout=10
